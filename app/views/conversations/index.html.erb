@@ -1,0 +1,26 @@
+<h1>Conversations for <%= @agent.name %></h1>
+
+<p>
+  <%= link_to "Back to agent", agent_path(@agent) %>
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Token</th>
+      <th>Messages</th>
+      <th>Last message</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @conversations.each do |conversation| %>
+      <tr>
+        <td><%= conversation.public_token %></td>
+        <td><%= conversation.messages.size %></td>
+        <td><%= conversation.last_message_at || conversation.created_at %></td>
+        <td><%= link_to "Show", agent_conversation_path(@agent, conversation) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

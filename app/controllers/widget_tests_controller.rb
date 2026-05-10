@@ -1,0 +1,9 @@
+class WidgetTestsController < ApplicationController
+  def show
+    @agent = if params[:agent_token].present?
+      Agent.find_by(public_token: params[:agent_token])
+    else
+      Agent.first
+    end
+  end
+end

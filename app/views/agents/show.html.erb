@@ -1,0 +1,78 @@
+<p><%= notice %></p>
+
+<h1><%= @agent.name %></h1>
+
+<p>
+  <strong>Public token:</strong>
+  <%= @agent.public_token %>
+</p>
+
+<p>
+  <strong>Welcome message:</strong>
+  <%= @agent.welcome_message %>
+</p>
+
+<p>
+  <strong>Tone:</strong>
+  <%= @agent.tone %>
+</p>
+
+<p>
+  <strong>Primary goal:</strong>
+  <%= @agent.primary_goal %>
+</p>
+
+<p>
+  <strong>Active:</strong>
+  <%= @agent.active? ? "Yes" : "No" %>
+</p>
+
+<h2>Widget customization</h2>
+
+<p>
+  <strong>Title:</strong>
+  <%= @agent.widget_title %>
+</p>
+
+<p>
+  <strong>Primary color:</strong>
+  <%= @agent.widget_primary_color %>
+</p>
+
+<p>
+  <strong>Position:</strong>
+  <%= @agent.widget_position %>
+</p>
+
+<p>
+  <strong>Send label:</strong>
+  <%= @agent.widget_send_label %>
+</p>
+
+<p>
+  <strong>Placeholder:</strong>
+  <%= @agent.widget_placeholder %>
+</p>
+
+<p>
+  <strong>System prompt:</strong>
+</p>
+<pre><%= @agent.system_prompt %></pre>
+
+<p>
+  <strong>Integration script:</strong>
+</p>
+<pre><code>&lt;script src="http://localhost:3000/widget.js" data-agent-token="<%= @agent.public_token %>"&gt;&lt;/script&gt;</code></pre>
+
+<p>
+  <%= link_to "View conversations", agent_conversations_path(@agent) %>
+</p>
+
+<p>
+  <%= link_to "Knowledge sources", agent_knowledge_sources_path(@agent) %>
+</p>
+
+<p>
+  <%= link_to "Edit", edit_agent_path(@agent) %> |
+  <%= link_to "Back to agents", agents_path %>
+</p>

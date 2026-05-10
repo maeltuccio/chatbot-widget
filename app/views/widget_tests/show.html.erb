@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Widget test</title>
+  </head>
+  <body>
+    <h1>Page cliente de test</h1>
+
+    <% if @agent.present? %>
+      <p>
+        Testing agent:
+        <strong><%= @agent.name %></strong>
+        (<code><%= @agent.public_token %></code>)
+      </p>
+
+      <script src="http://localhost:3000/widget.js" data-agent-token="<%= @agent.public_token %>"></script>
+    <% else %>
+      <p>No agent found for this token. Run <code>bin/rails db:seed</code> first or use a valid agent token.</p>
+    <% end %>
+  </body>
+</html>

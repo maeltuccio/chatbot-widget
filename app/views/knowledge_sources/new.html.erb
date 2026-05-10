@@ -1,0 +1,7 @@
+<h1>New knowledge source for <%= @agent.name %></h1>
+
+<%= render "form", agent: @agent, knowledge_source: @knowledge_source %>
+
+<p>
+  <%= link_to "Back to knowledge sources", agent_knowledge_sources_path(@agent) %>
+</p>

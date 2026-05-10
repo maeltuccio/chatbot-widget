@@ -1,0 +1,27 @@
+<% if knowledge_source.errors.any? %>
+  <div>
+    <h2><%= pluralize(knowledge_source.errors.count, "error") %> prohibited this knowledge source from being saved:</h2>
+
+    <ul>
+      <% knowledge_source.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<%= form_with(model: [agent, knowledge_source]) do |form| %>
+  <div>
+    <%= form.label :title %><br>
+    <%= form.text_field :title %>
+  </div>
+
+  <div>
+    <%= form.label :raw_content, "Content" %><br>
+    <%= form.text_area :raw_content, rows: 16 %>
+  </div>
+
+  <div>
+    <%= form.submit %>
+  </div>
+<% end %>

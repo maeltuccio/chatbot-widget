@@ -1,0 +1,35 @@
+<h1>Conversation</h1>
+
+<p>
+  <strong>Agent:</strong>
+  <%= @agent.name %>
+</p>
+
+<p>
+  <strong>Token:</strong>
+  <%= @conversation.public_token %>
+</p>
+
+<p>
+  <%= link_to "Back to conversations", agent_conversations_path(@agent) %> |
+  <%= link_to "Back to agent", agent_path(@agent) %>
+</p>
+
+<% if @conversation.summary.present? %>
+  <section>
+    <h2>Summary</h2>
+    <pre><%= @conversation.summary %></pre>
+  </section>
+<% end %>
+
+<hr>
+
+<% @messages.each do |message| %>
+  <article>
+    <p>
+      <strong><%= message.role.capitalize %></strong>
+      <small><%= message.created_at %></small>
+    </p>
+    <pre><%= message.content %></pre>
+  </article>
+<% end %>

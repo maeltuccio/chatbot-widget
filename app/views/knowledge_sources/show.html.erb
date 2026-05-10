@@ -1,0 +1,44 @@
+<p><%= notice %></p>
+
+<h1><%= @knowledge_source.title %></h1>
+
+<p>
+  <%= link_to "Edit", edit_agent_knowledge_source_path(@agent, @knowledge_source) %> |
+  <%= link_to "Back to knowledge sources", agent_knowledge_sources_path(@agent) %>
+</p>
+
+<p>
+  <strong>Agent:</strong>
+  <%= @agent.name %>
+</p>
+
+<p>
+  <strong>Type:</strong>
+  <%= @knowledge_source.source_type %>
+</p>
+
+<p>
+  <strong>Status:</strong>
+  <%= @knowledge_source.status %>
+</p>
+
+<p>
+  <strong>Chunks:</strong>
+  <%= @knowledge_chunks.size %>
+</p>
+
+<h2>Content</h2>
+<pre><%= @knowledge_source.raw_content %></pre>
+
+<h2>Chunks</h2>
+
+<% if @knowledge_chunks.any? %>
+  <% @knowledge_chunks.each do |chunk| %>
+    <article>
+      <h3>Chunk <%= chunk.position + 1 %></h3>
+      <pre><%= chunk.content %></pre>
+    </article>
+  <% end %>
+<% else %>
+  <p>No chunks yet.</p>
+<% end %>

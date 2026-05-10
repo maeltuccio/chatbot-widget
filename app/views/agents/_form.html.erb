@@ -1,0 +1,76 @@
+<% if agent.errors.any? %>
+  <div>
+    <h2><%= pluralize(agent.errors.count, "error") %> prohibited this agent from being saved:</h2>
+
+    <ul>
+      <% agent.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<%= form_with(model: agent) do |form| %>
+  <div>
+    <%= form.label :name %><br>
+    <%= form.text_field :name %>
+  </div>
+
+  <div>
+    <%= form.label :welcome_message %><br>
+    <%= form.text_area :welcome_message %>
+  </div>
+
+  <div>
+    <%= form.label :tone %><br>
+    <%= form.text_field :tone %>
+  </div>
+
+  <div>
+    <%= form.label :primary_goal %><br>
+    <%= form.text_field :primary_goal %>
+  </div>
+
+  <div>
+    <%= form.label :system_prompt %><br>
+    <%= form.text_area :system_prompt %>
+  </div>
+
+  <fieldset>
+    <legend>Widget customization</legend>
+
+    <div>
+      <%= form.label :widget_title %><br>
+      <%= form.text_field :widget_title %>
+    </div>
+
+    <div>
+      <%= form.label :widget_primary_color %><br>
+      <%= form.color_field :widget_primary_color, value: agent.widget_primary_color.presence || "#111827" %>
+    </div>
+
+    <div>
+      <%= form.label :widget_position %><br>
+      <%= form.select :widget_position, [["Bottom right", "bottom_right"], ["Bottom left", "bottom_left"]] %>
+    </div>
+
+    <div>
+      <%= form.label :widget_send_label %><br>
+      <%= form.text_field :widget_send_label %>
+    </div>
+
+    <div>
+      <%= form.label :widget_placeholder %><br>
+      <%= form.text_field :widget_placeholder %>
+    </div>
+  </fieldset>
+
+  <div>
+    <%= form.check_box :active %>
+    <%= form.label :active %>
+  </div>
+
+  <div>
+    <%= form.submit %>
+  </div>
+<% end %>

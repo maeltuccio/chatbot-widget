@@ -1,0 +1,27 @@
+<h1>Agents</h1>
+
+<p>
+  <%= link_to "New agent", new_agent_path %>
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Tone</th>
+      <th>Active</th>
+      <th colspan="2"></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @agents.each do |agent| %>
+      <tr>
+        <td><%= agent.name %></td>
+        <td><%= agent.tone %></td>
+        <td><%= agent.active? ? "Yes" : "No" %></td>
+        <td><%= link_to "Show", agent_path(agent) %></td>
+        <td><%= link_to "Edit", edit_agent_path(agent) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
