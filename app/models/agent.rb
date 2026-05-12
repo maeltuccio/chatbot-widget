@@ -5,6 +5,7 @@ class Agent < ApplicationRecord
   has_many :conversations, dependent: :destroy
   has_many :knowledge_sources, dependent: :destroy
   has_many :knowledge_chunks, dependent: :destroy
+  has_one :webflow_connection, dependent: :destroy
 
   before_validation :set_widget_defaults
   before_validation :generate_public_token, on: :create
@@ -15,6 +16,25 @@ class Agent < ApplicationRecord
   validates :widget_primary_color,
     format: { with: /\A#[0-9a-fA-F]{6}\z/, message: "must be a hex color like #2563eb" },
     allow_blank: true
+
+  def allowed_origin_list
+    allowed_origins.to_s
+      .split(/[\s,]+/)
+      .map(&:strip)
+      .reject(&:blank?)
+      .map { |origin| normalize_origin(origin) }
+      .compact
+      .uniq
+  end
+
+  def origin_allowed?(origin)
+    allowed = allowed_origin_list
+    return Rails.env.development? if allowed.blank?
+    return false if origin.blank?
+
+    normalized_origin = normalize_origin(origin)
+    allowed.include?(normalized_origin)
+  end
 
   private
 
@@ -28,5 +48,21 @@ class Agent < ApplicationRecord
 
   def generate_public_token
     self.public_token ||= SecureRandom.hex(10)
+  end
+
+  def normalize_origin(origin)
+    value = origin.to_s.strip
+    value = "https://#{value}" unless value.match?(/\Ahttps?:\/\//)
+
+    uri = URI.parse(value)
+    return if uri.host.blank?
+
+    port = uri.port
+    default_port = uri.scheme == "https" ? 443 : 80
+    normalized = "#{uri.scheme}://#{uri.host.downcase}"
+    normalized += ":#{port}" if port.present? && port != default_port
+    normalized
+  rescue URI::InvalidURIError
+    nil
   end
 end

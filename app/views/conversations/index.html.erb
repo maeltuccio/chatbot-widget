@@ -1,26 +1,34 @@
-<h1>Conversations for <%= @agent.name %></h1>
+<section class="page-header">
+  <div>
+    <span class="eyebrow">Conversations</span>
+    <h1 class="page-title"><%= @agent.name %></h1>
+    <p class="page-description">Inspect visitor sessions and review message history.</p>
+  </div>
 
-<p>
-  <%= link_to "Back to agent", agent_path(@agent) %>
-</p>
+  <div class="actions">
+    <%= link_to "Back to agent", agent_path(@agent), class: "btn" %>
+  </div>
+</section>
 
-<table>
-  <thead>
-    <tr>
-      <th>Token</th>
-      <th>Messages</th>
-      <th>Last message</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @conversations.each do |conversation| %>
+<section class="table-wrap">
+  <table>
+    <thead>
       <tr>
-        <td><%= conversation.public_token %></td>
-        <td><%= conversation.messages.size %></td>
-        <td><%= conversation.last_message_at || conversation.created_at %></td>
-        <td><%= link_to "Show", agent_conversation_path(@agent, conversation) %></td>
+        <th>Token</th>
+        <th>Messages</th>
+        <th>Last message</th>
+        <th>Actions</th>
       </tr>
-    <% end %>
-  </tbody>
-</table>
+    </thead>
+    <tbody>
+      <% @conversations.each do |conversation| %>
+        <tr>
+          <td><code><%= conversation.public_token %></code></td>
+          <td><%= conversation.messages.size %></td>
+          <td><%= l((conversation.last_message_at || conversation.created_at), format: :short) %></td>
+          <td><%= link_to "Open", agent_conversation_path(@agent, conversation), class: "btn" %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</section>

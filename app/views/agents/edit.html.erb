@@ -1,8 +1,14 @@
-<h1>Edit agent</h1>
+<section class="page-header">
+  <div>
+    <span class="eyebrow">Edit</span>
+    <h1 class="page-title"><%= @agent.name %></h1>
+    <p class="page-description">Update behavior, knowledge-facing instructions and widget settings.</p>
+  </div>
+
+  <div class="actions">
+    <%= link_to "Open agent", agent_path(@agent), class: "btn" %>
+    <%= link_to "Back", agents_path, class: "btn" %>
+  </div>
+</section>
 
 <%= render "form", agent: @agent %>
-
-<p>
-  <%= link_to "Show", agent_path(@agent) %> |
-  <%= link_to "Back to agents", agents_path %>
-</p>

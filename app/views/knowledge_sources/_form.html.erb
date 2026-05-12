@@ -1,7 +1,6 @@
 <% if knowledge_source.errors.any? %>
-  <div>
-    <h2><%= pluralize(knowledge_source.errors.count, "error") %> prohibited this knowledge source from being saved:</h2>
-
+  <div class="error-box">
+    <strong><%= pluralize(knowledge_source.errors.count, "error") %> prevented this source from being saved.</strong>
     <ul>
       <% knowledge_source.errors.full_messages.each do |message| %>
         <li><%= message %></li>
@@ -10,18 +9,23 @@
   </div>
 <% end %>
 
-<%= form_with(model: [agent, knowledge_source]) do |form| %>
-  <div>
-    <%= form.label :title %><br>
-    <%= form.text_field :title %>
-  </div>
+<section class="card form-card">
+  <div class="card-body">
+    <%= form_with(model: [agent, knowledge_source], class: "form-grid") do |form| %>
+      <div class="field">
+        <%= form.label :title %>
+        <%= form.text_field :title %>
+      </div>
 
-  <div>
-    <%= form.label :raw_content, "Content" %><br>
-    <%= form.text_area :raw_content, rows: 16 %>
-  </div>
+      <div class="field">
+        <%= form.label :raw_content, "Content" %>
+        <%= form.text_area :raw_content, rows: 18 %>
+        <p class="field-hint">Content is chunked automatically after saving.</p>
+      </div>
 
-  <div>
-    <%= form.submit %>
+      <div class="actions">
+        <%= form.submit %>
+      </div>
+    <% end %>
   </div>
-<% end %>
+</section>

@@ -1,5 +1,5 @@
 class AgentsController < ApplicationController
-  before_action :set_agent, only: [:show, :edit, :update]
+  before_action :set_agent, only: [:show, :edit, :update, :destroy]
 
   def index
     @agents = Agent.order(created_at: :desc)
@@ -33,6 +33,11 @@ class AgentsController < ApplicationController
     end
   end
 
+  def destroy
+    @agent.destroy!
+    redirect_to agents_path, notice: "Agent was successfully deleted."
+  end
+
   private
 
   def set_agent
@@ -51,7 +56,8 @@ class AgentsController < ApplicationController
       :widget_primary_color,
       :widget_position,
       :widget_send_label,
-      :widget_placeholder
+      :widget_placeholder,
+      :allowed_origins
     )
   end
 

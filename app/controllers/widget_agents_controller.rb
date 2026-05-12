@@ -3,6 +3,7 @@ class WidgetAgentsController < ApplicationController
 
   def show
     agent = Agent.find_by!(public_token: params[:public_token], active: true)
+    return unless ensure_origin_allowed!(agent)
 
     render json: {
       name: agent.name,
@@ -19,7 +20,15 @@ class WidgetAgentsController < ApplicationController
 
   private
 
+  def ensure_origin_allowed!(agent)
+    return true if agent.origin_allowed?(request.origin)
+
+    head :forbidden
+    false
+  end
+
   def set_cors_headers
-    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Origin"] = request.origin if request.origin.present?
+    response.headers["Vary"] = "Origin"
   end
 end

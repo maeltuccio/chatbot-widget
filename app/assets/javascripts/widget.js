@@ -28,7 +28,20 @@
     var header = document.createElement("button");
     header.type = "button";
     header.className = "chatbot-saas-header";
-    header.textContent = "Chat";
+    header.setAttribute("aria-expanded", "false");
+    header.setAttribute("aria-label", "Open chat");
+
+    var headerIcon = document.createElement("span");
+    headerIcon.className = "chatbot-saas-header-icon";
+    headerIcon.setAttribute("aria-hidden", "true");
+    headerIcon.innerHTML = '<svg viewBox="0 0 24 24" focusable="false"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.6 8.6 0 0 1-7.7 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.1a8.4 8.4 0 0 1-1.1-4.4 8.6 8.6 0 0 1 17.2 0Z"></path></svg>';
+
+    var headerTitle = document.createElement("span");
+    headerTitle.className = "chatbot-saas-header-title";
+    headerTitle.textContent = "Chat";
+
+    header.appendChild(headerIcon);
+    header.appendChild(headerTitle);
 
     var body = document.createElement("div");
     body.className = "chatbot-saas-body";
@@ -69,15 +82,63 @@
       if (extraClass) {
         message.className += " " + extraClass;
       }
-      message.textContent = text;
+      renderMessageContent(message, text);
       messages.appendChild(message);
       messages.scrollTop = messages.scrollHeight;
       return message;
     }
 
+    function renderMessageContent(message, text) {
+      var content = text || "";
+      var urlPattern = /(https?:\/\/[^\s<]+)/g;
+      var lastIndex = 0;
+      var match;
+
+      message.textContent = "";
+
+      while ((match = urlPattern.exec(content)) !== null) {
+        if (match.index > lastIndex) {
+          message.appendChild(document.createTextNode(content.slice(lastIndex, match.index)));
+        }
+
+        var rawUrl = match[0];
+        var trailingPunctuation = "";
+
+        while (/[.,;:!?)]$/.test(rawUrl)) {
+          trailingPunctuation = rawUrl.slice(-1) + trailingPunctuation;
+          rawUrl = rawUrl.slice(0, -1);
+        }
+
+        var link = document.createElement("a");
+        link.href = rawUrl;
+        link.textContent = rawUrl;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        message.appendChild(link);
+
+        if (trailingPunctuation) {
+          message.appendChild(document.createTextNode(trailingPunctuation));
+        }
+
+        lastIndex = match.index + match[0].length;
+      }
+
+      if (lastIndex < content.length) {
+        message.appendChild(document.createTextNode(content.slice(lastIndex)));
+      }
+    }
+
+    function normalizeAssistantText(text) {
+      return text
+        .replace(/([A-Za-zÀ-ÖØ-öø-ÿ])([0-9])/g, "$1 $2")
+        .replace(/([0-9])([A-Za-zÀ-ÖØ-öø-ÿ])/g, "$1 $2")
+        .replace(/([.!?])([A-ZÀ-Ö])/g, "$1 $2");
+    }
+
     function appendToMessage(message, text) {
       message.classList.remove("chatbot-saas-message-typing");
-      message.textContent += text;
+      message.dataset.rawContent = normalizeAssistantText((message.dataset.rawContent || message.textContent) + text);
+      renderMessageContent(message, message.dataset.rawContent);
       messages.scrollTop = messages.scrollHeight;
     }
 
@@ -212,9 +273,19 @@
       });
     }
 
+    function setChatOpen(isOpen) {
+      panel.classList.toggle("chatbot-saas-panel-open", isOpen);
+      body.classList.toggle("chatbot-saas-body-open", isOpen);
+      header.setAttribute("aria-expanded", isOpen ? "true" : "false");
+      header.setAttribute("aria-label", isOpen ? "Close chat" : "Open chat");
+
+      if (isOpen) {
+        input.focus();
+      }
+    }
+
     header.addEventListener("click", function () {
-      panel.classList.toggle("chatbot-saas-panel-open");
-      body.classList.toggle("chatbot-saas-body-open");
+      setChatOpen(!panel.classList.contains("chatbot-saas-panel-open"));
     });
 
     form.addEventListener("submit", function (event) {
@@ -253,7 +324,7 @@
 
         container.className = "chatbot-saas-position-" + (agent.widget_position || "bottom_right").replace("_", "-");
         container.style.setProperty("--chatbot-saas-primary-color", primaryColor);
-        header.textContent = agent.widget_title || agent.name || "Chat";
+        headerTitle.textContent = agent.widget_title || agent.name || "Chat";
         submit.textContent = agent.widget_send_label || "Send";
         input.placeholder = agent.widget_placeholder || "Type your message...";
         welcome.textContent = agent.welcome_message || "Hi! How can I help you today?";

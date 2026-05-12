@@ -6,8 +6,13 @@ Rails.application.routes.draw do
   post "/widget/messages/stream", to: "widget_messages#stream"
   match "/widget/messages", to: "widget_messages#preflight", via: :options
   match "/widget/messages/stream", to: "widget_messages#preflight", via: :options
+  get "/webflow/oauth/callback", to: "webflow_connections#callback", as: :webflow_oauth_callback
 
-  resources :agents, only: [:index, :show, :new, :create, :edit, :update] do
+  resources :agents, only: [:index, :show, :new, :create, :edit, :update, :destroy] do
+    resource :webflow_connection, only: [:show, :update, :destroy] do
+      get :connect
+      post :sync
+    end
     resources :conversations, only: [:index, :show]
     resources :knowledge_sources
   end

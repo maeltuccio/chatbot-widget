@@ -1,7 +1,6 @@
 <% if agent.errors.any? %>
-  <div>
-    <h2><%= pluralize(agent.errors.count, "error") %> prohibited this agent from being saved:</h2>
-
+  <div class="error-box">
+    <strong><%= pluralize(agent.errors.count, "error") %> prevented this agent from being saved.</strong>
     <ul>
       <% agent.errors.full_messages.each do |message| %>
         <li><%= message %></li>
@@ -10,67 +9,77 @@
   </div>
 <% end %>
 
-<%= form_with(model: agent) do |form| %>
-  <div>
-    <%= form.label :name %><br>
-    <%= form.text_field :name %>
+<section class="card form-card">
+  <div class="card-body">
+    <%= form_with(model: agent, class: "form-grid") do |form| %>
+      <div class="field">
+        <%= form.label :name %>
+        <%= form.text_field :name %>
+      </div>
+
+      <div class="field">
+        <%= form.label :welcome_message %>
+        <%= form.text_area :welcome_message, rows: 3 %>
+      </div>
+
+      <div class="field">
+        <%= form.label :tone %>
+        <%= form.text_field :tone %>
+      </div>
+
+      <div class="field">
+        <%= form.label :primary_goal %>
+        <%= form.text_field :primary_goal %>
+      </div>
+
+      <div class="field">
+        <%= form.label :system_prompt %>
+        <%= form.text_area :system_prompt, rows: 10 %>
+      </div>
+
+      <fieldset class="form-grid">
+        <legend>Widget customization</legend>
+
+        <div class="field">
+          <%= form.label :widget_title %>
+          <%= form.text_field :widget_title %>
+        </div>
+
+        <div class="field">
+          <%= form.label :widget_primary_color %>
+          <%= form.color_field :widget_primary_color, value: agent.widget_primary_color.presence || "#111827" %>
+        </div>
+
+        <div class="field">
+          <%= form.label :widget_position %>
+          <%= form.select :widget_position, [["Bottom right", "bottom_right"], ["Bottom left", "bottom_left"]] %>
+        </div>
+
+        <div class="field">
+          <%= form.label :widget_send_label %>
+          <%= form.text_field :widget_send_label %>
+        </div>
+
+        <div class="field">
+          <%= form.label :widget_placeholder %>
+          <%= form.text_field :widget_placeholder %>
+        </div>
+
+        <div class="field">
+          <%= form.label :allowed_origins, "Allowed widget domains" %>
+          <%= form.text_area :allowed_origins, rows: 3, placeholder: "https://example.com\nhttps://www.example.com" %>
+          <p class="field-hint">One domain per line. Leave blank only for local development.</p>
+        </div>
+      </fieldset>
+
+      <div class="check-field">
+        <%= form.check_box :active %>
+        <%= form.label :active %>
+      </div>
+
+      <div class="actions">
+        <%= form.submit %>
+      </div>
+    <% end %>
   </div>
-
-  <div>
-    <%= form.label :welcome_message %><br>
-    <%= form.text_area :welcome_message %>
-  </div>
-
-  <div>
-    <%= form.label :tone %><br>
-    <%= form.text_field :tone %>
-  </div>
-
-  <div>
-    <%= form.label :primary_goal %><br>
-    <%= form.text_field :primary_goal %>
-  </div>
-
-  <div>
-    <%= form.label :system_prompt %><br>
-    <%= form.text_area :system_prompt %>
-  </div>
-
-  <fieldset>
-    <legend>Widget customization</legend>
-
-    <div>
-      <%= form.label :widget_title %><br>
-      <%= form.text_field :widget_title %>
-    </div>
-
-    <div>
-      <%= form.label :widget_primary_color %><br>
-      <%= form.color_field :widget_primary_color, value: agent.widget_primary_color.presence || "#111827" %>
-    </div>
-
-    <div>
-      <%= form.label :widget_position %><br>
-      <%= form.select :widget_position, [["Bottom right", "bottom_right"], ["Bottom left", "bottom_left"]] %>
-    </div>
-
-    <div>
-      <%= form.label :widget_send_label %><br>
-      <%= form.text_field :widget_send_label %>
-    </div>
-
-    <div>
-      <%= form.label :widget_placeholder %><br>
-      <%= form.text_field :widget_placeholder %>
-    </div>
-  </fieldset>
-
-  <div>
-    <%= form.check_box :active %>
-    <%= form.label :active %>
-  </div>
-
-  <div>
-    <%= form.submit %>
-  </div>
-<% end %>
+</section>

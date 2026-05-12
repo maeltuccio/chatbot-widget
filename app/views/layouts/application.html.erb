@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <title>ChatbotSaas</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -10,7 +10,41 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
-    <%= yield %>
+  <body class="backoffice-shell">
+    <aside class="app-sidebar">
+      <%= link_to root_path, class: "app-brand" do %>
+        <span class="app-brand-mark">AI</span>
+        <span>
+          <strong>Chatbot SaaS</strong>
+          <small>Backoffice</small>
+        </span>
+      <% end %>
+
+      <nav class="app-nav" aria-label="Backoffice navigation">
+        <%= link_to "Agents", agents_path, class: "app-nav-link" %>
+      </nav>
+    </aside>
+
+    <div class="app-frame">
+      <header class="topbar">
+        <div>
+          <span class="topbar-kicker">Workspace</span>
+          <strong>AI Operations Console</strong>
+        </div>
+        <span class="topbar-status">Development</span>
+      </header>
+
+      <main class="app-main">
+        <% if notice.present? %>
+          <div class="flash flash-notice"><%= notice %></div>
+        <% end %>
+
+        <% if alert.present? %>
+          <div class="flash flash-alert"><%= alert %></div>
+        <% end %>
+
+        <%= yield %>
+      </main>
+    </div>
   </body>
 </html>

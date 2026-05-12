@@ -13,6 +13,8 @@ class WidgetMessagesController < ApplicationController
 
   def create
     agent = Agent.find_by!(public_token: params[:agent_token], active: true)
+    return unless ensure_origin_allowed!(agent)
+
     message = params[:message].to_s.strip
 
     if message.blank?
@@ -52,6 +54,8 @@ class WidgetMessagesController < ApplicationController
     set_stream_headers
 
     agent = Agent.find_by!(public_token: params[:agent_token], active: true)
+    return unless ensure_origin_allowed!(agent, stream: true)
+
     message = params[:message].to_s.strip
 
     if message.blank?
@@ -89,6 +93,18 @@ class WidgetMessagesController < ApplicationController
   end
 
   private
+
+  def ensure_origin_allowed!(agent, stream: false)
+    return true if agent.origin_allowed?(request.origin)
+
+    if stream
+      write_sse(:error, error: "This widget is not allowed on this domain.")
+    else
+      render json: { error: "This widget is not allowed on this domain." }, status: :forbidden
+    end
+
+    false
+  end
 
   def find_or_create_conversation(agent)
     conversation = agent.conversations.find_by(public_token: params[:conversation_token])
@@ -213,6 +229,7 @@ class WidgetMessagesController < ApplicationController
     instructions << "Primary goal: #{agent.primary_goal}." if agent.primary_goal.present?
     instructions << knowledge_instructions(agent, visitor_message)
     instructions << "Keep replies concise, helpful, and directly useful to the visitor."
+    instructions << "Format replies with normal spacing between words, dates, and punctuation. Use short paragraphs or bullet points when the answer contains multiple options."
     instructions.compact.join("\n\n")
   end
 
@@ -282,9 +299,10 @@ class WidgetMessagesController < ApplicationController
   end
 
   def set_cors_headers
-    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Origin"] = request.origin if request.origin.present?
     response.headers["Access-Control-Allow-Methods"] = "POST, OPTIONS"
     response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+    response.headers["Vary"] = "Origin"
   end
 
   def set_stream_headers

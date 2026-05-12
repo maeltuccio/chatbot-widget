@@ -1,0 +1,81 @@
+<section class="page-header">
+  <div>
+    <span class="eyebrow">Integration</span>
+    <h1 class="page-title">Webflow</h1>
+    <p class="page-description">Connect a Webflow CMS collection to <%= @agent.name %>. The selected collection is synced into this agent's knowledge base.</p>
+  </div>
+
+  <div class="actions">
+    <%= link_to "Back to agent", agent_path(@agent), class: "btn" %>
+  </div>
+</section>
+
+<section class="grid grid-two">
+  <article class="card">
+    <div class="card-body">
+      <h2 class="section-title">Connection</h2>
+
+      <% if @connection.present? %>
+        <div class="detail-list">
+          <div class="detail-row">
+            <span class="detail-label">Status</span>
+            <span class="badge <%= @connection.configured? ? "badge-success" : "badge-warning" %>"><%= @connection.status %></span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Site</span>
+            <span><%= @connection.site_name.presence || @connection.site_id.presence || "Not selected" %></span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Collection</span>
+            <span><%= @connection.collection_name.presence || @connection.collection_id.presence || "Not selected" %></span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Last sync</span>
+            <span><%= @connection.last_synced_at.present? ? l(@connection.last_synced_at, format: :short) : "Never" %></span>
+          </div>
+        </div>
+
+        <div class="actions form-actions">
+          <%= button_to "Sync now", sync_agent_webflow_connection_path(@agent), method: :post, class: "btn btn-primary", disabled: !@connection.syncable? %>
+          <%= button_to "Disconnect", agent_webflow_connection_path(@agent), method: :delete, class: "danger-button", form: { data: { turbo_confirm: "Disconnect Webflow from this agent?" } } %>
+        </div>
+      <% else %>
+        <p class="muted">Webflow is not connected yet.</p>
+        <%= link_to "Connect Webflow", connect_agent_webflow_connection_path(@agent), class: "btn btn-primary" %>
+      <% end %>
+    </div>
+  </article>
+
+  <article class="card">
+    <div class="card-body">
+      <h2 class="section-title">CMS collection</h2>
+
+      <% if @connection.present? %>
+        <%= form_with(model: @connection, url: agent_webflow_connection_path(@agent), method: :patch, class: "form-grid") do |form| %>
+          <div class="field">
+            <%= form.label :site_id, "Webflow site" %>
+            <%= form.select :site_id,
+              options_for_select(@sites.map { |site| [site["displayName"] || site["name"] || site["id"], site["id"]] }, @connection.site_id),
+              { prompt: "Choose a site" },
+              onchange: "this.form.submit()" %>
+            <p class="field-hint">Pick the site that contains the Services CMS collection.</p>
+          </div>
+
+          <div class="field">
+            <%= form.label :collection_id, "Services collection" %>
+            <%= form.select :collection_id,
+              options_for_select(@collections.map { |collection| [collection["displayName"] || collection["name"] || collection["slug"] || collection["id"], collection["id"]] }, @connection.collection_id),
+              { prompt: @connection.site_id.present? ? "Choose a collection" : "Choose a site first" } %>
+            <p class="field-hint">Only this collection will be imported into this agent.</p>
+          </div>
+
+          <div class="actions">
+            <%= form.submit "Save collection", class: "btn btn-primary" %>
+          </div>
+        <% end %>
+      <% else %>
+        <p class="muted">Connect Webflow first, then choose the CMS collection to use as this agent's service catalog.</p>
+      <% end %>
+    </div>
+  </article>
+</section>

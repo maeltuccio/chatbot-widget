@@ -1,44 +1,61 @@
-<p><%= notice %></p>
+<section class="page-header">
+  <div>
+    <span class="eyebrow">Knowledge source</span>
+    <h1 class="page-title"><%= @knowledge_source.title %></h1>
+    <p class="page-description">Review raw source content and the chunks available to retrieval.</p>
+  </div>
 
-<h1><%= @knowledge_source.title %></h1>
+  <div class="actions">
+    <%= link_to "Edit", edit_agent_knowledge_source_path(@agent, @knowledge_source), class: "btn btn-primary" %>
+    <%= link_to "Back", agent_knowledge_sources_path(@agent), class: "btn" %>
+  </div>
+</section>
 
-<p>
-  <%= link_to "Edit", edit_agent_knowledge_source_path(@agent, @knowledge_source) %> |
-  <%= link_to "Back to knowledge sources", agent_knowledge_sources_path(@agent) %>
-</p>
+<section class="stats-grid">
+  <div class="stat-card">
+    <strong><%= @knowledge_source.status %></strong>
+    <span>Status</span>
+  </div>
+  <div class="stat-card">
+    <strong><%= @knowledge_chunks.size %></strong>
+    <span>Chunks</span>
+  </div>
+  <div class="stat-card">
+    <strong><%= @knowledge_source.source_type %></strong>
+    <span>Source type</span>
+  </div>
+</section>
 
-<p>
-  <strong>Agent:</strong>
-  <%= @agent.name %>
-</p>
+<section class="grid">
+  <article class="card">
+    <div class="card-body">
+      <h2 class="section-title">Content</h2>
+      <pre><%= @knowledge_source.raw_content %></pre>
+    </div>
+  </article>
 
-<p>
-  <strong>Type:</strong>
-  <%= @knowledge_source.source_type %>
-</p>
+  <article class="card">
+    <div class="card-body">
+      <h2 class="section-title">Chunks</h2>
 
-<p>
-  <strong>Status:</strong>
-  <%= @knowledge_source.status %>
-</p>
-
-<p>
-  <strong>Chunks:</strong>
-  <%= @knowledge_chunks.size %>
-</p>
-
-<h2>Content</h2>
-<pre><%= @knowledge_source.raw_content %></pre>
-
-<h2>Chunks</h2>
-
-<% if @knowledge_chunks.any? %>
-  <% @knowledge_chunks.each do |chunk| %>
-    <article>
-      <h3>Chunk <%= chunk.position + 1 %></h3>
-      <pre><%= chunk.content %></pre>
-    </article>
-  <% end %>
-<% else %>
-  <p>No chunks yet.</p>
-<% end %>
+      <% if @knowledge_chunks.any? %>
+        <div class="message-list">
+          <% @knowledge_chunks.each do |chunk| %>
+            <article class="message-card">
+              <div class="message-meta">
+                <strong>Chunk <%= chunk.position + 1 %></strong>
+                <span class="muted"><%= chunk.embedding_model %></span>
+              </div>
+              <pre><%= chunk.content %></pre>
+            </article>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="empty-state">
+          <strong>No chunks yet</strong>
+          <p>Save the source to generate retrieval chunks.</p>
+        </div>
+      <% end %>
+    </div>
+  </article>
+</section>

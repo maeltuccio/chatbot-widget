@@ -1,6 +1,7 @@
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -80,7 +81,8 @@ CREATE TABLE public.agents (
     widget_primary_color character varying,
     widget_position character varying,
     widget_send_label character varying,
-    widget_placeholder character varying
+    widget_placeholder character varying,
+    allowed_origins text
 );
 
 
@@ -267,6 +269,46 @@ CREATE TABLE public.schema_migrations (
 
 
 --
+-- Name: webflow_connections; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.webflow_connections (
+    id bigint NOT NULL,
+    agent_id bigint NOT NULL,
+    access_token_ciphertext text NOT NULL,
+    scope character varying,
+    status character varying DEFAULT 'connected'::character varying NOT NULL,
+    site_id character varying,
+    site_name character varying,
+    collection_id character varying,
+    collection_name character varying,
+    last_synced_at timestamp(6) without time zone,
+    metadata jsonb DEFAULT '{}'::jsonb NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: webflow_connections_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.webflow_connections_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: webflow_connections_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.webflow_connections_id_seq OWNED BY public.webflow_connections.id;
+
+
+--
 -- Name: accounts id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -291,14 +333,7 @@ ALTER TABLE ONLY public.conversations ALTER COLUMN id SET DEFAULT nextval('publi
 -- Name: knowledge_chunks id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.knowledge_chunks ALTER COLUMN id SET DEFAULT nextval('public.knowledge_chunks_id_seq'::regclass);
-
-
---
--- Name: knowledge_sources id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.knowledge_sources ALTER COLUMN id SET DEFAULT nextval('public.knowledge_sources_id_seq'::regclass);
+ALTER TABLE ONLY public.knowledge_chunks ALTER COLUMN id SET DEFAULT nextval('public.knowledge_chunksublic.knowledge_sources ALTER COLUMN id SET DEFAULT nextval('public.knowledge_sources_id_seq'::regclass);
 
 
 --
@@ -306,6 +341,13 @@ ALTER TABLE ONLY public.knowledge_sources ALTER COLUMN id SET DEFAULT nextval('p
 --
 
 ALTER TABLE ONLY public.messages ALTER COLUMN id SET DEFAULT nextval('public.messages_id_seq'::regclass);
+
+
+--
+-- Name: webflow_connections id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.webflow_connections ALTER COLUMN id SET DEFAULT nextval('public.webflow_connections_id_seq'::regclass);
 
 
 --
@@ -370,6 +412,14 @@ ALTER TABLE ONLY public.messages
 
 ALTER TABLE ONLY public.schema_migrations
     ADD CONSTRAINT schema_migrations_pkey PRIMARY KEY (version);
+
+
+--
+-- Name: webflow_connections webflow_connections_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.webflow_connections
+    ADD CONSTRAINT webflow_connections_pkey PRIMARY KEY (id);
 
 
 --
@@ -478,6 +528,20 @@ CREATE INDEX index_messages_on_conversation_id_and_created_at ON public.messages
 
 
 --
+-- Name: index_webflow_connections_on_agent_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_webflow_connections_on_agent_id ON public.webflow_connections USING btree (agent_id);
+
+
+--
+-- Name: index_webflow_connections_on_status; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_webflow_connections_on_status ON public.webflow_connections USING btree (status);
+
+
+--
 -- Name: knowledge_chunks fk_rails_1a7d6d9fe8; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -510,6 +574,14 @@ ALTER TABLE ONLY public.conversations
 
 
 --
+-- Name: webflow_connections fk_rails_ecba4a60eb; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.webflow_connections
+    ADD CONSTRAINT fk_rails_ecba4a60eb FOREIGN KEY (agent_id) REFERENCES public.agents(id);
+
+
+--
 -- Name: agents fk_rails_f6a7a5a81e; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -532,6 +604,10 @@ ALTER TABLE ONLY public.knowledge_sources
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260512123000'),
+('20260512120000'),
+('20260511154500'),
+('20260511143000'),
 ('20260510130116'),
 ('20260510130115'),
 ('20260510125205'),
@@ -541,3 +617,21 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20260510115620'),
 ('20260510103020'),
 ('20260510103007');
+
+SET search_path TO "$user", public;
+
+INSERT INTO "schema_migrations" (version) VALUES
+('20260512123000'),
+('20260512120000'),
+('20260511154500'),
+('20260511143000'),
+('20260510130116'),
+('20260510130115'),
+('20260510125205'),
+('20260510122728'),
+('20260510122412'),
+('20260510115621'),
+('20260510115620'),
+('20260510103020'),
+('20260510103007');
+

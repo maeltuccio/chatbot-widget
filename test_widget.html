@@ -1,11 +1,575 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
   <head>
-    <title>Widget test</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Epilepsy Courses | Formation médicale continue</title>
+    <style>
+      :root {
+        --bg: #f7f8fa;
+        --surface: #ffffff;
+        --surface-soft: #eef6f8;
+        --text: #172033;
+        --muted: #667085;
+        --line: #dde3ea;
+        --primary: #137c89;
+        --primary-dark: #0e5962;
+        --accent: #e5a236;
+        --shadow: 0 18px 45px rgba(23, 32, 51, 0.08);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        line-height: 1.5;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        border-bottom: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(12px);
+      }
+
+      .header-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: min(1180px, calc(100% - 40px));
+        min-height: 76px;
+        margin: 0 auto;
+        gap: 24px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+
+      .brand-mark {
+        display: grid;
+        place-items: center;
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        background: var(--primary);
+        color: #fff;
+        font-size: 18px;
+      }
+
+      .nav {
+        display: flex;
+        align-items: center;
+        gap: 26px;
+        color: var(--muted);
+        font-size: 15px;
+        font-weight: 600;
+      }
+
+      .nav a:hover {
+        color: var(--text);
+      }
+
+      .header-action {
+        padding: 10px 16px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: var(--surface);
+        color: var(--primary-dark);
+        font-size: 14px;
+        font-weight: 800;
+      }
+
+      main {
+        overflow: hidden;
+      }
+
+      .hero {
+        width: min(1180px, calc(100% - 40px));
+        margin: 0 auto;
+        padding: 72px 0 54px;
+      }
+
+      .hero-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.95fr);
+        align-items: center;
+        gap: 56px;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 18px;
+        padding: 7px 11px;
+        border: 1px solid #bfe0e4;
+        border-radius: 999px;
+        background: #f0fbfc;
+        color: var(--primary-dark);
+        font-size: 13px;
+        font-weight: 800;
+      }
+
+      .eyebrow::before {
+        width: 7px;
+        height: 7px;
+        border-radius: 999px;
+        background: var(--accent);
+        content: "";
+      }
+
+      h1 {
+        max-width: 690px;
+        margin: 0;
+        color: var(--text);
+        font-size: clamp(42px, 5.8vw, 72px);
+        line-height: 0.98;
+        letter-spacing: -0.05em;
+      }
+
+      .hero-copy {
+        max-width: 620px;
+        margin: 24px 0 0;
+        color: var(--muted);
+        font-size: 19px;
+      }
+
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 14px;
+        margin-top: 32px;
+      }
+
+      .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 46px;
+        padding: 0 18px;
+        border-radius: 10px;
+        font-weight: 800;
+      }
+
+      .button-primary {
+        background: var(--primary);
+        color: #fff;
+        box-shadow: 0 12px 24px rgba(19, 124, 137, 0.22);
+      }
+
+      .button-secondary {
+        border: 1px solid var(--line);
+        background: var(--surface);
+        color: var(--text);
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+        margin-top: 46px;
+        max-width: 640px;
+      }
+
+      .stat {
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.76);
+      }
+
+      .stat strong {
+        display: block;
+        color: var(--text);
+        font-size: 24px;
+        letter-spacing: -0.03em;
+      }
+
+      .stat span {
+        display: block;
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .preview-card {
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        background: var(--surface);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+
+      .preview-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 18px 20px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .preview-title {
+        font-size: 14px;
+        font-weight: 800;
+      }
+
+      .preview-status {
+        color: var(--primary-dark);
+        font-size: 13px;
+        font-weight: 800;
+      }
+
+      .course-list {
+        display: grid;
+        gap: 14px;
+        padding: 20px;
+      }
+
+      .course-item {
+        display: grid;
+        grid-template-columns: 56px minmax(0, 1fr);
+        gap: 14px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: #fbfcfd;
+      }
+
+      .date-box {
+        display: grid;
+        place-items: center;
+        height: 56px;
+        border-radius: 14px;
+        background: var(--surface-soft);
+        color: var(--primary-dark);
+        font-weight: 900;
+        line-height: 1;
+      }
+
+      .date-box span {
+        display: block;
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 800;
+      }
+
+      .course-item h2 {
+        margin: 0 0 4px;
+        font-size: 16px;
+        letter-spacing: -0.02em;
+      }
+
+      .course-item p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .section {
+        width: min(1180px, calc(100% - 40px));
+        margin: 0 auto;
+        padding: 46px 0;
+      }
+
+      .section-header {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 24px;
+        margin-bottom: 22px;
+      }
+
+      .section-header h2 {
+        max-width: 560px;
+        margin: 0;
+        font-size: clamp(30px, 3vw, 42px);
+        line-height: 1.05;
+        letter-spacing: -0.04em;
+      }
+
+      .section-header p {
+        max-width: 440px;
+        margin: 0;
+        color: var(--muted);
+      }
+
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .card {
+        min-height: 210px;
+        padding: 24px;
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        background: var(--surface);
+      }
+
+      .icon {
+        display: grid;
+        place-items: center;
+        width: 42px;
+        height: 42px;
+        margin-bottom: 22px;
+        border-radius: 12px;
+        background: var(--surface-soft);
+        color: var(--primary-dark);
+        font-weight: 900;
+      }
+
+      .card h3 {
+        margin: 0 0 10px;
+        font-size: 19px;
+        letter-spacing: -0.02em;
+      }
+
+      .card p {
+        margin: 0;
+        color: var(--muted);
+      }
+
+      .banner {
+        width: min(1180px, calc(100% - 40px));
+        margin: 40px auto 80px;
+        padding: 34px;
+        border-radius: 24px;
+        background: #172033;
+        color: #fff;
+      }
+
+      .banner-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 28px;
+      }
+
+      .banner h2 {
+        margin: 0 0 8px;
+        font-size: clamp(26px, 3vw, 38px);
+        letter-spacing: -0.04em;
+      }
+
+      .banner p {
+        max-width: 640px;
+        margin: 0;
+        color: #cbd5e1;
+      }
+
+      .banner .button {
+        flex: 0 0 auto;
+        background: #fff;
+        color: var(--text);
+      }
+
+      @media (max-width: 880px) {
+        .header-inner {
+          min-height: auto;
+          padding: 16px 0;
+        }
+
+        .nav {
+          display: none;
+        }
+
+        .hero {
+          padding-top: 48px;
+        }
+
+        .hero-grid {
+          grid-template-columns: 1fr;
+          gap: 34px;
+        }
+
+        .preview-card {
+          max-width: 560px;
+        }
+
+        .cards {
+          grid-template-columns: 1fr;
+        }
+
+        .section-header,
+        .banner-content {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+      }
+
+      @media (max-width: 560px) {
+        .header-action {
+          display: none;
+        }
+
+        .hero,
+        .section,
+        .banner,
+        .header-inner {
+          width: min(100% - 28px, 1180px);
+        }
+
+        .stats {
+          grid-template-columns: 1fr;
+        }
+
+        .hero-actions {
+          align-items: stretch;
+          flex-direction: column;
+        }
+
+        .button {
+          width: 100%;
+        }
+
+        .banner {
+          padding: 26px;
+        }
+      }
+    </style>
   </head>
   <body>
-    <h1>Test pour le script Roboto </h1>
+    <header class="site-header">
+      <div class="header-inner">
+        <a class="brand" href="#">
+          <span class="brand-mark">N</span>
+          <span>Epilepsy Courses</span>
+        </a>
 
-    <script src="http://localhost:3000/widget.js" data-agent-token="c41d556d28c3c6ba3fbc"></script>
-  </body>
+        <nav class="nav" aria-label="Navigation principale">
+          <a href="#">Formations</a>
+          <a href="#">Programme</a>
+          <a href="#">Intervenants</a>
+          <a href="#">Contact</a>
+        </nav>
+
+        <a class="header-action" href="#">Espace participant</a>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-grid">
+          <div>
+            <span class="eyebrow">Formation médicale continue</span>
+            <h1>Des parcours pratiques pour les équipes de neurologie.</h1>
+            <p class="hero-copy">
+              Epilepsy Courses accompagne les professionnels de santé avec des formations courtes, structurées et orientées cas cliniques.
+            </p>
+
+            <div class="hero-actions">
+              <a class="button button-primary" href="#">Voir les sessions</a>
+              <a class="button button-secondary" href="#">Télécharger le programme</a>
+            </div>
+
+            <div class="stats" aria-label="Chiffres clés">
+              <div class="stat">
+                <strong>24</strong>
+                <span>sessions organisées</span>
+              </div>
+              <div class="stat">
+                <strong>1 200+</strong>
+                <span>participants formés</span>
+              </div>
+              <div class="stat">
+                <strong>36</strong>
+                <span>experts invités</span>
+              </div>
+            </div>
+          </div>
+
+          <aside class="preview-card" aria-label="Prochaines formations">
+            <div class="preview-top">
+              <span class="preview-title">Prochaines sessions</span>
+              <span class="preview-status">Inscriptions ouvertes</span>
+            </div>
+
+            <div class="course-list">
+              <article class="course-item">
+                <div class="date-box">18<span>JUIN</span></div>
+                <div>
+                  <h2>Atelier SEEG avancé</h2>
+                  <p>Analyse de cas, planification et stratégie d'implantation.</p>
+                </div>
+              </article>
+
+              <article class="course-item">
+                <div class="date-box">03<span>JUIL</span></div>
+                <div>
+                  <h2>Lecture EEG intensive</h2>
+                  <p>Session pratique en petit groupe avec correction guidée.</p>
+                </div>
+              </article>
+
+              <article class="course-item">
+                <div class="date-box">22<span>SEPT</span></div>
+                <div>
+                  <h2>Réunion multidisciplinaire</h2>
+                  <p>Décision thérapeutique et préparation des dossiers complexes.</p>
+                </div>
+              </article>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-header">
+          <h2>Un format pensé pour une utilisation terrain.</h2>
+          <p>Des modules courts, des ressources claires et un accompagnement direct pour répondre aux questions des participants.</p>
+        </div>
+
+        <div class="cards">
+          <article class="card">
+            <div class="icon">01</div>
+            <h3>Cas cliniques commentés</h3>
+            <p>Chaque session s'appuie sur des situations réelles et des décisions expliquées étape par étape.</p>
+          </article>
+
+          <article class="card">
+            <div class="icon">02</div>
+            <h3>Support expert</h3>
+            <p>Les participants peuvent préparer leurs questions avant la formation et poursuivre les échanges après la session.</p>
+          </article>
+
+          <article class="card">
+            <div class="icon">03</div>
+            <h3>Ressources centralisées</h3>
+            <p>Programmes, documents et informations pratiques restent accessibles depuis un espace participant simple.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="banner">
+        <div class="banner-content">
+          <div>
+            <h2>Besoin d'une information avant votre inscription ?</h2>
+            <p>Notre assistant peut répondre aux questions courantes sur les sessions, les prérequis, les dates et l'organisation pratique.</p>
+          </div>
+          <a class="button" href="#">Nous contacter</a>
+        </div>
+      </section>
+    </main>
+<script src="http://localhost:3000/widget.js" data-agent-token="ee5e4f60c889d5cb48bc"></script>
+</body>
 </html>

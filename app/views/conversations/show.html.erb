@@ -1,35 +1,60 @@
-<h1>Conversation</h1>
+<section class="page-header">
+  <div>
+    <span class="eyebrow">Conversation</span>
+    <h1 class="page-title"><%= @conversation.public_token.first(10) %>...</h1>
+    <p class="page-description">Conversation attached to <%= @agent.name %>.</p>
+  </div>
 
-<p>
-  <strong>Agent:</strong>
-  <%= @agent.name %>
-</p>
+  <div class="actions">
+    <%= link_to "Back to conversations", agent_conversations_path(@agent), class: "btn" %>
+    <%= link_to "Back to agent", agent_path(@agent), class: "btn" %>
+  </div>
+</section>
 
-<p>
-  <strong>Token:</strong>
-  <%= @conversation.public_token %>
-</p>
-
-<p>
-  <%= link_to "Back to conversations", agent_conversations_path(@agent) %> |
-  <%= link_to "Back to agent", agent_path(@agent) %>
-</p>
-
-<% if @conversation.summary.present? %>
-  <section>
-    <h2>Summary</h2>
-    <pre><%= @conversation.summary %></pre>
-  </section>
-<% end %>
-
-<hr>
-
-<% @messages.each do |message| %>
-  <article>
-    <p>
-      <strong><%= message.role.capitalize %></strong>
-      <small><%= message.created_at %></small>
-    </p>
-    <pre><%= message.content %></pre>
+<section class="grid">
+  <article class="card">
+    <div class="card-body">
+      <h2 class="section-title">Details</h2>
+      <div class="detail-list">
+        <div class="detail-row">
+          <span class="detail-label">Agent</span>
+          <span><%= @agent.name %></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Token</span>
+          <span><code><%= @conversation.public_token %></code></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Messages</span>
+          <span><%= @messages.size %></span>
+        </div>
+      </div>
+    </div>
   </article>
-<% end %>
+
+  <% if @conversation.summary.present? %>
+    <article class="card">
+      <div class="card-body">
+        <h2 class="section-title">Summary</h2>
+        <pre><%= @conversation.summary %></pre>
+      </div>
+    </article>
+  <% end %>
+
+  <article class="card">
+    <div class="card-body">
+      <h2 class="section-title">Messages</h2>
+      <div class="message-list">
+        <% @messages.each do |message| %>
+          <article class="message-card">
+            <div class="message-meta">
+              <span class="badge <%= message.role == "assistant" ? "badge-success" : "" %>"><%= message.role.capitalize %></span>
+              <span class="muted"><%= l(message.created_at, format: :short) %></span>
+            </div>
+            <pre><%= message.content %></pre>
+          </article>
+        <% end %>
+      </div>
+    </div>
+  </article>
+</section>
