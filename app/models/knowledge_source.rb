@@ -21,20 +21,19 @@ class KnowledgeSource < ApplicationRecord
 
       build_chunks.each_with_index do |content, index|
         embedding = KnowledgeEmbedding.embed(content)
-        UsageEvent.record_embedding!(
-          agent: agent,
-          knowledge_source: self,
-          content: content,
-          embedding: embedding
-        )
+        record_embedding_usage(content, embedding) if embedding.present?
 
-        knowledge_chunks.create!(
+        attributes = {
           agent: agent,
           content: content,
           position: index,
-          embedding_model: KnowledgeChunk::EMBEDDING_MODEL,
-          embedding: KnowledgeEmbedding.vector_to_database(KnowledgeEmbedding.embedding_vector(embedding))
-        )
+          embedding_model: KnowledgeChunk::EMBEDDING_MODEL
+        }
+        if embedding.present? && KnowledgeEmbedding.vector_column_available?
+          attributes[:embedding] = KnowledgeEmbedding.vector_to_database(KnowledgeEmbedding.embedding_vector(embedding))
+        end
+
+        knowledge_chunks.create!(attributes)
       end
 
       update!(status: "ready")
@@ -64,5 +63,14 @@ class KnowledgeSource < ApplicationRecord
     return [text] if text.length <= CHUNK_MAX_LENGTH
 
     text.scan(/.{1,#{CHUNK_MAX_LENGTH}}(?:\s+|$)/m).map(&:strip)
+  end
+
+  def record_embedding_usage(content, embedding)
+    UsageEvent.record_embedding!(
+      agent: agent,
+      knowledge_source: self,
+      content: content,
+      embedding: embedding
+    )
   end
 end

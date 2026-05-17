@@ -24,7 +24,7 @@ class KnowledgeSourcesController < ApplicationController
 
     if @knowledge_source.save
       @knowledge_source.rebuild_chunks!
-      redirect_to agent_knowledge_source_path(@agent, @knowledge_source), notice: "Knowledge source was successfully created."
+      redirect_to agent_knowledge_source_path(@agent, @knowledge_source), notice: "La source de connaissance a bien été créée."
     else
       render :new, status: :unprocessable_entity
     end
@@ -36,7 +36,7 @@ class KnowledgeSourcesController < ApplicationController
   def update
     if @knowledge_source.update(knowledge_source_params)
       @knowledge_source.rebuild_chunks!
-      redirect_to agent_knowledge_source_path(@agent, @knowledge_source), notice: "Knowledge source was successfully updated."
+      redirect_to agent_knowledge_source_path(@agent, @knowledge_source), notice: "La source de connaissance a bien été mise à jour."
     else
       render :edit, status: :unprocessable_entity
     end
@@ -44,7 +44,7 @@ class KnowledgeSourcesController < ApplicationController
 
   def destroy
     @knowledge_source.destroy!
-    redirect_to agent_knowledge_sources_path(@agent), notice: "Knowledge source was successfully deleted."
+    redirect_to agent_knowledge_sources_path(@agent), notice: "La source de connaissance a bien été supprimée."
   end
 
   private

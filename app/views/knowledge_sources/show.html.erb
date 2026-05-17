@@ -1,49 +1,49 @@
 <section class="page-header">
   <div>
-    <span class="eyebrow">Knowledge source</span>
+    <span class="eyebrow">Source de connaissance</span>
     <h1 class="page-title"><%= @knowledge_source.title %></h1>
-    <p class="page-description">Review raw source content and the chunks available to retrieval.</p>
+    <p class="page-description">Consultez le contenu brut et les morceaux disponibles pour la recherche.</p>
   </div>
 
   <div class="actions">
-    <%= link_to "Edit", edit_agent_knowledge_source_path(@agent, @knowledge_source), class: "btn btn-primary" %>
-    <%= link_to "Back", agent_knowledge_sources_path(@agent), class: "btn" %>
+    <%= link_to "Modifier", edit_agent_knowledge_source_path(@agent, @knowledge_source), class: "btn btn-primary" %>
+    <%= link_to "Retour", agent_knowledge_sources_path(@agent), class: "btn" %>
   </div>
 </section>
 
 <section class="stats-grid">
   <div class="stat-card">
-    <strong><%= @knowledge_source.status %></strong>
-    <span>Status</span>
+    <strong><%= source_status_label(@knowledge_source.status) %></strong>
+    <span>Statut</span>
   </div>
   <div class="stat-card">
     <strong><%= @knowledge_chunks.size %></strong>
-    <span>Chunks</span>
+    <span>Morceaux</span>
   </div>
   <div class="stat-card">
-    <strong><%= @knowledge_source.source_type %></strong>
-    <span>Source type</span>
+    <strong><%= source_type_label(@knowledge_source.source_type) %></strong>
+    <span>Type de source</span>
   </div>
 </section>
 
 <section class="grid">
   <article class="card">
     <div class="card-body">
-      <h2 class="section-title">Content</h2>
+      <h2 class="section-title">Contenu</h2>
       <pre><%= @knowledge_source.raw_content %></pre>
     </div>
   </article>
 
   <article class="card">
     <div class="card-body">
-      <h2 class="section-title">Chunks</h2>
+      <h2 class="section-title">Morceaux</h2>
 
       <% if @knowledge_chunks.any? %>
         <div class="message-list">
           <% @knowledge_chunks.each do |chunk| %>
             <article class="message-card">
               <div class="message-meta">
-                <strong>Chunk <%= chunk.position + 1 %></strong>
+                <strong>Morceau <%= chunk.position + 1 %></strong>
                 <span class="muted"><%= chunk.embedding_model %></span>
               </div>
               <pre><%= chunk.content %></pre>
@@ -52,8 +52,8 @@
         </div>
       <% else %>
         <div class="empty-state">
-          <strong>No chunks yet</strong>
-          <p>Save the source to generate retrieval chunks.</p>
+          <strong>Aucun morceau pour le moment</strong>
+          <p>Enregistrez la source pour générer les morceaux de recherche.</p>
         </div>
       <% end %>
     </div>

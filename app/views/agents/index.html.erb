@@ -1,27 +1,27 @@
 <section class="page-header">
   <div>
     <span class="eyebrow">Agents</span>
-    <h1 class="page-title">AI agents</h1>
-    <p class="page-description">Manage assistants, widget settings, conversations and knowledge bases from one control surface.</p>
+    <h1 class="page-title">Agents IA</h1>
+    <p class="page-description">Gérez les assistants, le widget, les conversations et les bases de connaissance depuis une seule interface.</p>
   </div>
 
   <div class="actions">
-    <%= link_to "New agent", new_agent_path, class: "btn btn-primary" %>
+    <%= link_to "Nouvel agent", new_agent_path, class: "btn btn-primary" %>
   </div>
 </section>
 
 <section class="stats-grid">
   <div class="stat-card">
     <strong><%= @agents.size %></strong>
-    <span>Total agents</span>
+    <span>Agents au total</span>
   </div>
   <div class="stat-card">
     <strong><%= @agents.count(&:active?) %></strong>
-    <span>Active</span>
+    <span>Actifs</span>
   </div>
   <div class="stat-card">
     <strong><%= @agents.sum { |agent| agent.knowledge_sources.size } %></strong>
-    <span>Knowledge sources</span>
+    <span>Sources de connaissance</span>
   </div>
 </section>
 
@@ -29,10 +29,10 @@
   <table>
     <thead>
       <tr>
-        <th>Name</th>
+        <th>Nom</th>
         <th>Tone</th>
-        <th>Status</th>
-        <th>Knowledge</th>
+        <th>Statut</th>
+        <th>Connaissance</th>
         <th>Actions</th>
       </tr>
     </thead>
@@ -45,22 +45,22 @@
               <small><%= agent.public_token %></small>
             </span>
           </td>
-          <td><%= agent.tone.presence || "Not set" %></td>
+          <td><%= agent.tone.presence || "Non défini" %></td>
           <td>
             <span class="badge <%= agent.active? ? "badge-success" : "badge-warning" %>">
-              <%= agent.active? ? "Active" : "Inactive" %>
+              <%= agent_status_label(agent) %>
             </span>
           </td>
           <td><%= pluralize(agent.knowledge_sources.size, "source") %></td>
           <td>
             <div class="actions">
-              <%= link_to "Open", agent_path(agent), class: "btn" %>
-              <%= link_to "Edit", edit_agent_path(agent), class: "btn" %>
-              <%= button_to "Delete",
+              <%= link_to "Ouvrir", agent_path(agent), class: "btn" %>
+              <%= link_to "Modifier", edit_agent_path(agent), class: "btn" %>
+              <%= button_to "Supprimer",
                 agent_path(agent),
                 method: :delete,
                 class: "danger-button",
-                form: { data: { turbo_confirm: "Delete #{agent.name}? This will also delete its conversations and knowledge sources." } } %>
+                form: { data: { turbo_confirm: "Supprimer #{agent.name} ? Cela supprimera aussi ses conversations et ses sources de connaissance." } } %>
             </div>
           </td>
         </tr>

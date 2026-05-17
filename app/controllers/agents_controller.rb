@@ -21,7 +21,7 @@ class AgentsController < ApplicationController
     @agent = current_account.agents.new(agent_params)
 
     if @agent.save
-      redirect_to @agent, notice: "Agent was successfully created."
+      redirect_to @agent, notice: "L'agent a bien été créé."
     else
       render :new, status: :unprocessable_entity
     end
@@ -34,13 +34,13 @@ class AgentsController < ApplicationController
     if @agent.update(agent_params)
       respond_to do |format|
         format.html do
-          flash.now[:notice] = "Agent was successfully updated."
+          flash.now[:notice] = "L'agent a bien été mis à jour."
           render :edit, status: :ok
         end
 
         format.json do
           render json: {
-            message: "Chatbot preview updated.",
+            message: "L'aperçu du chatbot a été mis à jour.",
             playground_url: playground_agent_path(@agent),
             widget_theme: @agent.widget_theme
           }
@@ -60,7 +60,7 @@ class AgentsController < ApplicationController
 
   def destroy
     @agent.destroy!
-    redirect_to agents_path, notice: "Agent was successfully deleted."
+    redirect_to agents_path, notice: "L'agent a bien été supprimé."
   end
 
   private

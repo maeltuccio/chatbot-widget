@@ -15,7 +15,7 @@ class WebflowConnectionsController < ApplicationController
       @collections = client.collections(@connection.site_id) if @connection.site_id.present?
     end
   rescue Webflow::Client::Error => error
-    flash.now[:alert] = "Webflow is connected, but the API could not be read: #{error.message}"
+    flash.now[:alert] = "Webflow est connecté, mais l'API n'a pas pu être lue : #{error.message}"
   end
 
   def connect
@@ -32,14 +32,14 @@ class WebflowConnectionsController < ApplicationController
       scopes: WEBFLOW_SCOPES
     ), allow_other_host: true
   rescue KeyError
-    redirect_to agent_path(@agent), alert: "WEBFLOW_CLIENT_ID and WEBFLOW_CLIENT_SECRET must be configured first."
+    redirect_to agent_path(@agent), alert: "WEBFLOW_CLIENT_ID et WEBFLOW_CLIENT_SECRET doivent d'abord être configurés."
   end
 
   def callback
     @agent = current_account.agents.find(session[:webflow_oauth_agent_id])
 
     unless valid_oauth_state?
-      redirect_to agent_path(@agent), alert: "Webflow connection could not be verified. Please try again."
+      redirect_to agent_path(@agent), alert: "La connexion Webflow n'a pas pu être vérifiée. Veuillez réessayer."
       return
     end
 
@@ -57,13 +57,13 @@ class WebflowConnectionsController < ApplicationController
     connection.save!
 
     clear_oauth_state
-    redirect_to agent_webflow_connection_path(@agent), notice: "Webflow connected. Choose the CMS collection to sync."
+    redirect_to agent_webflow_connection_path(@agent), notice: "Webflow est connecté. Choisissez la collection CMS à synchroniser."
   rescue KeyError
-    redirect_to agent_path(@agent), alert: "Webflow did not return the expected OAuth data."
+    redirect_to agent_path(@agent), alert: "Webflow n'a pas renvoyé les données OAuth attendues."
   rescue ActiveRecord::RecordNotFound
-    redirect_to agents_path, alert: "Webflow connection expired. Please start again from the agent."
+    redirect_to agents_path, alert: "La connexion Webflow a expiré. Veuillez recommencer depuis l'agent."
   rescue Webflow::Client::Error => error
-    redirect_to agent_path(@agent), alert: "Webflow connection failed: #{error.message}"
+    redirect_to agent_path(@agent), alert: "La connexion Webflow a échoué : #{error.message}"
   end
 
   def update
@@ -79,15 +79,15 @@ class WebflowConnectionsController < ApplicationController
       status: collection.present? ? "configured" : "connected"
     )
 
-    message = collection.present? ? "Webflow collection saved." : "Webflow site saved. Choose the CMS collection to sync."
+    message = collection.present? ? "La collection Webflow a été enregistrée." : "Le site Webflow a été enregistré. Choisissez la collection CMS à synchroniser."
     redirect_to agent_webflow_connection_path(@agent), notice: message
   rescue Webflow::Client::Error => error
-    redirect_to agent_webflow_connection_path(@agent), alert: "Could not save Webflow collection: #{error.message}"
+    redirect_to agent_webflow_connection_path(@agent), alert: "Impossible d'enregistrer la collection Webflow : #{error.message}"
   end
 
   def sync
     unless @connection.syncable?
-      redirect_to agent_webflow_connection_path(@agent), alert: "Choose a Webflow site and collection before syncing."
+      redirect_to agent_webflow_connection_path(@agent), alert: "Choisissez un site et une collection Webflow avant de synchroniser."
       return
     end
 
@@ -107,15 +107,15 @@ class WebflowConnectionsController < ApplicationController
       )
     )
 
-    redirect_to agent_path(@agent), notice: "Webflow services synced into this agent."
+    redirect_to agent_path(@agent), notice: "Les services Webflow ont été synchronisés dans cet agent."
   rescue Webflow::Client::Error => error
     @connection.update(status: "failed") if @connection.present?
-    redirect_to agent_webflow_connection_path(@agent), alert: "Webflow sync failed: #{error.message}"
+    redirect_to agent_webflow_connection_path(@agent), alert: "La synchronisation Webflow a échoué : #{error.message}"
   end
 
   def destroy
     @connection&.destroy!
-    redirect_to agent_path(@agent), notice: "Webflow disconnected from this agent."
+    redirect_to agent_path(@agent), notice: "Webflow a été déconnecté de cet agent."
   end
 
   private

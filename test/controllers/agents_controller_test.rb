@@ -87,7 +87,7 @@ class AgentsControllerTest < ActionDispatch::IntegrationTest
     }
 
     assert_response :success
-    assert_equal "Chatbot preview updated.", response.parsed_body["message"]
+    assert_equal "L'aperçu du chatbot a été mis à jour.", response.parsed_body["message"]
     assert_equal playground_agent_path(agent), response.parsed_body["playground_url"]
     assert_equal "dark", response.parsed_body["widget_theme"]
     assert_equal "dark", agent.reload.widget_theme
@@ -102,6 +102,6 @@ class AgentsControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_redirected_to agents_url
-    assert_equal "Agent was successfully deleted.", flash[:notice]
+    assert_equal "L'agent a bien été supprimé.", flash[:notice]
   end
 end

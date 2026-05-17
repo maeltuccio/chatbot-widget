@@ -1,13 +1,13 @@
 <section class="page-header">
   <div>
-    <span class="eyebrow">Knowledge</span>
+    <span class="eyebrow">Connaissance</span>
     <h1 class="page-title"><%= @agent.name %></h1>
-    <p class="page-description">Curate the source material used by the assistant when answering visitors.</p>
+    <p class="page-description">Gérez les contenus utilisés par l'assistant pour répondre aux visiteurs.</p>
   </div>
 
   <div class="actions">
-    <%= link_to "New source", new_agent_knowledge_source_path(@agent), class: "btn btn-primary" %>
-    <%= link_to "Back to agent", agent_path(@agent), class: "btn" %>
+    <%= link_to "Nouvelle source", new_agent_knowledge_source_path(@agent), class: "btn btn-primary" %>
+    <%= link_to "Retour à l'agent", agent_path(@agent), class: "btn" %>
   </div>
 </section>
 
@@ -15,11 +15,11 @@
   <table>
     <thead>
       <tr>
-        <th>Title</th>
+        <th>Titre</th>
         <th>Type</th>
-        <th>Status</th>
-        <th>Chunks</th>
-        <th>Updated</th>
+        <th>Statut</th>
+        <th>Morceaux</th>
+        <th>Mis à jour</th>
         <th>Actions</th>
       </tr>
     </thead>
@@ -32,23 +32,23 @@
               <small><%= truncate(knowledge_source.raw_content.to_s, length: 84) %></small>
             </span>
           </td>
-          <td><%= knowledge_source.source_type %></td>
+          <td><%= source_type_label(knowledge_source.source_type) %></td>
           <td>
             <span class="badge <%= knowledge_source.status == "ready" ? "badge-success" : "badge-warning" %>">
-              <%= knowledge_source.status %>
+              <%= source_status_label(knowledge_source.status) %>
             </span>
           </td>
           <td><%= knowledge_source.knowledge_chunks.size %></td>
           <td><%= l(knowledge_source.updated_at, format: :short) %></td>
           <td>
             <div class="actions">
-              <%= link_to "Open", agent_knowledge_source_path(@agent, knowledge_source), class: "btn" %>
-              <%= link_to "Edit", edit_agent_knowledge_source_path(@agent, knowledge_source), class: "btn" %>
-              <%= button_to "Delete",
+              <%= link_to "Ouvrir", agent_knowledge_source_path(@agent, knowledge_source), class: "btn" %>
+              <%= link_to "Modifier", edit_agent_knowledge_source_path(@agent, knowledge_source), class: "btn" %>
+              <%= button_to "Supprimer",
                 agent_knowledge_source_path(@agent, knowledge_source),
                 method: :delete,
                 class: "danger-button",
-                form: { data: { turbo_confirm: "Delete this knowledge source?" } } %>
+                form: { data: { turbo_confirm: "Supprimer cette source de connaissance ?" } } %>
             </div>
           </td>
         </tr>

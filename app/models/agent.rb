@@ -47,7 +47,7 @@ class Agent < ApplicationRecord
     self.widget_position = "bottom_right" if widget_position.blank?
     self.widget_theme = "glass" if widget_theme.blank?
     self.widget_show_title = true if widget_show_title.nil?
-    self.widget_send_label = "Send" if widget_send_label.blank?
+    self.widget_send_label = "Envoyer" if widget_send_label.blank?
     self.widget_placeholder = "Entrez votre message ..." if widget_placeholder.blank?
   end
 

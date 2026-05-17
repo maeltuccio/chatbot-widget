@@ -1,7 +1,7 @@
 class KnowledgeEmbedding
   class << self
     def available?
-      ENV["OPENAI_API_KEY"].present?
+      ENV["OPENAI_API_KEY"].present? && vector_column_available?
     end
 
     def embed(text)
@@ -37,6 +37,12 @@ class KnowledgeEmbedding
       return if embedding.blank? || !embedding.respond_to?(:vectors)
 
       embedding.vectors
+    end
+
+    def vector_column_available?
+      KnowledgeChunk.column_names.include?("embedding")
+    rescue ActiveRecord::ActiveRecordError
+      false
     end
   end
 end

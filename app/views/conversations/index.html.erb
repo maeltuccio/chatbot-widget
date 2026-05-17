@@ -2,11 +2,11 @@
   <div>
     <span class="eyebrow">Conversations</span>
     <h1 class="page-title"><%= @agent.name %></h1>
-    <p class="page-description">Inspect visitor sessions and review message history.</p>
+    <p class="page-description">Consultez les sessions visiteurs et l'historique des messages.</p>
   </div>
 
   <div class="actions">
-    <%= link_to "Back to agent", agent_path(@agent), class: "btn" %>
+    <%= link_to "Retour à l'agent", agent_path(@agent), class: "btn" %>
   </div>
 </section>
 
@@ -16,7 +16,7 @@
       <tr>
         <th>Token</th>
         <th>Messages</th>
-        <th>Last message</th>
+        <th>Dernier message</th>
         <th>Actions</th>
       </tr>
     </thead>
@@ -26,7 +26,7 @@
           <td><code><%= conversation.public_token %></code></td>
           <td><%= conversation.messages.size %></td>
           <td><%= l((conversation.last_message_at || conversation.created_at), format: :short) %></td>
-          <td><%= link_to "Open", agent_conversation_path(@agent, conversation), class: "btn" %></td>
+          <td><%= link_to "Ouvrir", agent_conversation_path(@agent, conversation), class: "btn" %></td>
         </tr>
       <% end %>
     </tbody>

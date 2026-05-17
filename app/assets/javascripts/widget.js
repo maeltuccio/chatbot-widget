@@ -30,7 +30,7 @@
     header.type = "button";
     header.className = "chatbot-saas-header";
     header.setAttribute("aria-expanded", autoOpen ? "true" : "false");
-    header.setAttribute("aria-label", autoOpen ? "Close chat" : "Open chat");
+    header.setAttribute("aria-label", autoOpen ? "Fermer le chat" : "Ouvrir le chat");
 
     var headerIcon = document.createElement("span");
     headerIcon.className = "chatbot-saas-header-icon";
@@ -52,7 +52,7 @@
 
     var welcome = document.createElement("div");
     welcome.className = "chatbot-saas-message chatbot-saas-message-assistant";
-    welcome.textContent = "Loading...";
+    welcome.textContent = "Chargement...";
     messages.appendChild(welcome);
 
     var form = document.createElement("form");
@@ -66,7 +66,7 @@
     var submit = document.createElement("button");
     submit.className = "chatbot-saas-submit";
     submit.type = "submit";
-    submit.textContent = "Send";
+    submit.textContent = "Envoyer";
 
     form.appendChild(input);
     form.appendChild(submit);
@@ -174,7 +174,7 @@
       if (eventName === "error") {
         typingBuffer.clear();
         assistantMessage.classList.remove("chatbot-saas-message-typing");
-        assistantMessage.textContent = eventData.error || "Sorry, the chat is not available right now.";
+        assistantMessage.textContent = eventData.error || "Désolé, le chat n'est pas disponible pour le moment.";
       }
     }
 
@@ -241,7 +241,7 @@
         })
       }).then(function (response) {
         if (!response.body) {
-          throw new Error("Streaming is not available in this browser.");
+          throw new Error("Le streaming n'est pas disponible dans ce navigateur.");
         }
 
         return readMessageStream(response, assistantMessage, typingBuffer);
@@ -252,7 +252,7 @@
       panel.classList.toggle("chatbot-saas-panel-open", isOpen);
       body.classList.toggle("chatbot-saas-body-open", isOpen);
       header.setAttribute("aria-expanded", isOpen ? "true" : "false");
-      header.setAttribute("aria-label", isOpen ? "Close chat" : "Open chat");
+      header.setAttribute("aria-label", isOpen ? "Fermer le chat" : "Ouvrir le chat");
 
       if (isOpen) {
         input.focus();
@@ -283,7 +283,7 @@
         .catch(function (error) {
           typingBuffer.clear();
           assistantMessage.classList.remove("chatbot-saas-message-typing");
-          assistantMessage.textContent = error.message || "Sorry, the chat is not available right now.";
+          assistantMessage.textContent = error.message || "Désolé, le chat n'est pas disponible pour le moment.";
         })
         .finally(function () {
           submit.disabled = false;
@@ -302,16 +302,16 @@
         container.style.setProperty("--chatbot-saas-primary-color", primaryColor);
         headerTitle.textContent = agent.widget_title || agent.name || "Chat";
         headerTitle.hidden = agent.widget_show_title === false;
-        submit.textContent = agent.widget_send_label || "Send";
-        input.placeholder = agent.widget_placeholder || "Type your message...";
-        welcome.textContent = agent.welcome_message || "Hi! How can I help you today?";
+        submit.textContent = agent.widget_send_label || "Envoyer";
+        input.placeholder = agent.widget_placeholder || "Écrivez votre message...";
+        welcome.textContent = agent.welcome_message || "Bonjour ! Comment puis-je vous aider ?";
 
         if (autoOpen) {
           setChatOpen(true);
         }
       })
       .catch(function () {
-        welcome.textContent = "Hi! How can I help you today?";
+        welcome.textContent = "Bonjour ! Comment puis-je vous aider ?";
 
         if (autoOpen) {
           setChatOpen(true);

@@ -19,7 +19,7 @@ class WidgetMessagesController < ApplicationController
     message = params[:message].to_s.strip
 
     if message.blank?
-      render json: { error: "Message can't be blank." }, status: :unprocessable_entity
+      render json: { error: "Le message ne peut pas être vide." }, status: :unprocessable_entity
       return
     end
 
@@ -31,7 +31,7 @@ class WidgetMessagesController < ApplicationController
 
     if ENV["OPENAI_API_KEY"].blank?
       render json: {
-        error: "OPENAI_API_KEY is not configured.",
+        error: "OPENAI_API_KEY n'est pas configurée.",
         conversation_token: @conversation.public_token
       }, status: :service_unavailable
       return
@@ -50,7 +50,7 @@ class WidgetMessagesController < ApplicationController
   rescue RubyLLM::Error => error
     Rails.logger.error("RubyLLM error: #{error.class} - #{error.message}")
     render json: {
-      error: "The AI assistant is not available right now.",
+      error: "L'assistant IA n'est pas disponible pour le moment.",
       conversation_token: @conversation&.public_token
     }, status: :bad_gateway
   end
@@ -64,7 +64,7 @@ class WidgetMessagesController < ApplicationController
     message = params[:message].to_s.strip
 
     if message.blank?
-      write_sse(:error, error: "Message can't be blank.")
+      write_sse(:error, error: "Le message ne peut pas être vide.")
       return
     end
 
@@ -77,7 +77,7 @@ class WidgetMessagesController < ApplicationController
     write_sse(:conversation, conversation_token: @conversation.public_token)
 
     if ENV["OPENAI_API_KEY"].blank?
-      write_sse(:error, error: "OPENAI_API_KEY is not configured.")
+      write_sse(:error, error: "OPENAI_API_KEY n'est pas configurée.")
       return
     end
 
@@ -94,7 +94,7 @@ class WidgetMessagesController < ApplicationController
     write_sse(:done, conversation_token: @conversation.public_token)
   rescue RubyLLM::Error => error
     Rails.logger.error("RubyLLM stream error: #{error.class} - #{error.message}")
-    write_sse(:error, error: "The AI assistant is not available right now.")
+    write_sse(:error, error: "L'assistant IA n'est pas disponible pour le moment.")
   ensure
     response.stream.close
   end
@@ -116,9 +116,9 @@ class WidgetMessagesController < ApplicationController
     return true if agent.origin_allowed?(request.origin) || backoffice_preview_allowed?(agent)
 
     if stream
-      write_sse(:error, error: "This widget is not allowed on this domain.")
+      write_sse(:error, error: "Ce widget n'est pas autorisé sur ce domaine.")
     else
-      render json: { error: "This widget is not allowed on this domain." }, status: :forbidden
+      render json: { error: "Ce widget n'est pas autorisé sur ce domaine." }, status: :forbidden
     end
 
     false
@@ -188,7 +188,7 @@ class WidgetMessagesController < ApplicationController
       if conversation.summary.present?
         chat.add_message(
           role: :user,
-          content: "Earlier conversation summary:\n#{conversation.summary}"
+          content: "Résumé de la conversation précédente :\n#{conversation.summary}"
         )
       end
 
@@ -228,17 +228,17 @@ class WidgetMessagesController < ApplicationController
   def summarize_messages(existing_summary, messages)
     chat = RubyLLM.chat
     chat.with_instructions(<<~INSTRUCTIONS.squish)
-      You summarize chatbot conversations for future context.
-      Keep only facts that help answer later user messages: user needs,
-      preferences, unresolved questions, decisions, and important product context.
-      Be concise. Do not invent details.
+      Tu résumes des conversations de chatbot pour conserver le contexte utile.
+      Garde seulement les faits qui aideront à répondre aux prochains messages :
+      besoins, préférences, questions non résolues, décisions et contexte produit important.
+      Sois concis. N'invente aucun détail.
     INSTRUCTIONS
 
     prompt = []
-    prompt << "Existing summary:\n#{existing_summary}" if existing_summary.present?
-    prompt << "New messages to merge into the summary:"
+    prompt << "Résumé existant :\n#{existing_summary}" if existing_summary.present?
+    prompt << "Nouveaux messages à intégrer au résumé :"
     prompt << messages.map { |message| "#{message.role}: #{message.content}" }.join("\n")
-    prompt << "Return an updated summary in 8 bullet points or fewer."
+    prompt << "Retourne un résumé mis à jour en 8 puces maximum."
 
     chat.ask(prompt.join("\n\n")).content
   end
@@ -270,11 +270,11 @@ class WidgetMessagesController < ApplicationController
   def agent_instructions(agent, visitor_message)
     instructions = []
     instructions << agent.system_prompt if agent.system_prompt.present?
-    instructions << "Tone: #{agent.tone}." if agent.tone.present?
-    instructions << "Primary goal: #{agent.primary_goal}." if agent.primary_goal.present?
+    instructions << "Ton : #{agent.tone}." if agent.tone.present?
+    instructions << "Objectif principal : #{agent.primary_goal}." if agent.primary_goal.present?
     instructions << knowledge_instructions(agent, visitor_message)
-    instructions << "Keep replies concise, helpful, and directly useful to the visitor."
-    instructions << "Format replies with normal spacing between words, dates, and punctuation. Use short paragraphs or bullet points when the answer contains multiple options."
+    instructions << "Réponds de manière concise, utile et directement exploitable par le visiteur."
+    instructions << "Formate les réponses avec des espaces normaux entre les mots, les dates et la ponctuation. Utilise des paragraphes courts ou des puces quand la réponse contient plusieurs options."
     instructions.compact.join("\n\n")
   end
 
@@ -283,14 +283,14 @@ class WidgetMessagesController < ApplicationController
     return if chunks.blank?
 
     context = chunks.map.with_index(1) do |chunk, index|
-      "Knowledge chunk #{index}:\n#{chunk.content}"
+      "Extrait de connaissance #{index} :\n#{chunk.content}"
     end.join("\n\n")
 
     <<~INSTRUCTIONS
-      Use this knowledge base context as the source of truth for product, company, policy, pricing, menu, and documentation questions.
-      If the visitor asks about something that is not present in this context, say that it is not available in the current knowledge base instead of inventing alternatives.
+      Utilise ce contexte de base de connaissance comme source de vérité pour les questions sur le produit, l'entreprise, les règles, les prix, le menu et la documentation.
+      Si le visiteur demande une information absente de ce contexte, dis qu'elle n'est pas disponible dans la base de connaissance actuelle au lieu d'inventer une réponse.
 
-      Knowledge base context:
+      Contexte de base de connaissance :
       #{context}
     INSTRUCTIONS
   end
@@ -303,6 +303,8 @@ class WidgetMessagesController < ApplicationController
   end
 
   def relevant_vector_chunks(agent, query)
+    return [] unless KnowledgeEmbedding.vector_column_available?
+
     query_embedding = KnowledgeEmbedding.embed(query)
     return [] if query_embedding.blank?
 

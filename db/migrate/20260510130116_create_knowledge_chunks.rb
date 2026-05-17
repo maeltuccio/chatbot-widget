@@ -13,12 +13,15 @@ class CreateKnowledgeChunks < ActiveRecord::Migration[7.1]
       t.timestamps
     end
 
-    execute "ALTER TABLE knowledge_chunks ADD COLUMN embedding vector(#{EMBEDDING_DIMENSIONS})"
     add_index :knowledge_chunks, [:agent_id, :knowledge_source_id]
     add_index :knowledge_chunks, [:knowledge_source_id, :position], unique: true
-    add_index :knowledge_chunks,
-      :embedding,
-      using: :hnsw,
-      opclass: :vector_cosine_ops
+
+    if extension_enabled?("vector")
+      execute "ALTER TABLE knowledge_chunks ADD COLUMN embedding vector(#{EMBEDDING_DIMENSIONS})"
+      add_index :knowledge_chunks,
+        :embedding,
+        using: :hnsw,
+        opclass: :vector_cosine_ops
+    end
   end
 end

@@ -38,7 +38,7 @@ class Rack::Attack
     [
       429,
       headers,
-      [{ error: "Too many requests. Please try again later." }.to_json]
+      [{ error: "Trop de requêtes. Veuillez réessayer dans un instant." }.to_json]
     ]
   end
 end

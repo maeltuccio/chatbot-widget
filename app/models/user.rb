@@ -36,7 +36,7 @@ class User < ApplicationRecord
     return if account.present?
 
     build_account(
-      name: account_name.presence || email.to_s.split("@").first.presence || "New Workspace",
+      name: account_name.presence || email.to_s.split("@").first.presence || "Nouvel espace de travail",
       owner_email: email,
       plan: "starter"
     )

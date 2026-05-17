@@ -1,31 +1,77 @@
-# Files in the config/locales directory are used for internationalization and
-# are automatically loaded by Rails. If you want to use locales other than
-# English, add the necessary files in this directory.
-#
-# To use the locales, use `I18n.t`:
-#
-#     I18n.t "hello"
-#
-# In views, this is aliased to just `t`:
-#
-#     <%= t("hello") %>
-#
-# To use a different locale, set it with `I18n.locale`:
-#
-#     I18n.locale = :es
-#
-# This would use the information in config/locales/es.yml.
-#
-# To learn more about the API, please read the Rails Internationalization guide
-# at https://guides.rubyonrails.org/i18n.html.
-#
-# Be aware that YAML interprets the following case-insensitive strings as
-# booleans: `true`, `false`, `on`, `off`, `yes`, `no`. Therefore, these strings
-# must be quoted to be interpreted as strings. For example:
-#
-#     en:
-#       "yes": yup
-#       enabled: "ON"
-
-en:
-  hello: "Hello world"
+fr:
+  date:
+    formats:
+      short: "%d/%m/%Y"
+  time:
+    formats:
+      short: "%d/%m/%Y %H:%M"
+  helpers:
+    submit:
+      create: "Créer"
+      update: "Enregistrer"
+      submit: "Enregistrer"
+    label:
+      agent:
+        name: "Nom"
+        welcome_message: "Message d'accueil"
+        tone: "Ton"
+        primary_goal: "Objectif principal"
+        system_prompt: "Prompt système"
+        widget_title: "Titre du widget"
+        widget_primary_color: "Couleur principale"
+        widget_position: "Position du widget"
+        widget_send_label: "Libellé du bouton d'envoi"
+        widget_placeholder: "Placeholder"
+        active: "Actif"
+      knowledge_source:
+        title: "Titre"
+        raw_content: "Contenu"
+  activerecord:
+    models:
+      account: "compte"
+      agent: "agent"
+      knowledge_source: "source de connaissance"
+      user: "utilisateur"
+    attributes:
+      user:
+        email: "E-mail"
+        password: "Mot de passe"
+        remember_me: "Se souvenir de moi"
+      agent:
+        name: "Nom"
+        public_token: "Jeton public"
+        welcome_message: "Message d'accueil"
+        tone: "Ton"
+        primary_goal: "Objectif principal"
+        system_prompt: "Prompt système"
+        widget_title: "Titre du widget"
+        widget_primary_color: "Couleur principale"
+        widget_position: "Position du widget"
+        widget_theme: "Thème du widget"
+        widget_show_title: "Afficher le titre"
+        widget_send_label: "Libellé du bouton d'envoi"
+        widget_placeholder: "Placeholder"
+        allowed_origins: "Domaines autorisés"
+        active: "Actif"
+      knowledge_source:
+        title: "Titre"
+        raw_content: "Contenu"
+    errors:
+      messages:
+        blank: "ne peut pas être vide"
+        taken: "est déjà utilisé"
+        inclusion: "n'est pas inclus dans la liste"
+        invalid: "n'est pas valide"
+        greater_than_or_equal_to: "doit être supérieur ou égal à %{count}"
+        not_a_number: "n'est pas un nombre"
+        not_an_integer: "doit être un entier"
+  errors:
+    format: "%{attribute} %{message}"
+    messages:
+      blank: "ne peut pas être vide"
+      taken: "est déjà utilisé"
+      inclusion: "n'est pas inclus dans la liste"
+      invalid: "n'est pas valide"
+      greater_than_or_equal_to: "doit être supérieur ou égal à %{count}"
+      not_a_number: "n'est pas un nombre"
+      not_an_integer: "doit être un entier"

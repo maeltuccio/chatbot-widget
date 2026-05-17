@@ -37,11 +37,11 @@ class Account < ApplicationRecord
 
   def usage_limit_message
     if monthly_message_limit_reached?
-      "Monthly AI reply limit reached for this workspace."
+      "La limite mensuelle de réponses IA est atteinte pour cet espace de travail."
     elsif monthly_token_limit_reached?
-      "Monthly token limit reached for this workspace."
+      "La limite mensuelle de tokens est atteinte pour cet espace de travail."
     else
-      "Usage limit reached for this workspace."
+      "La limite d'utilisation est atteinte pour cet espace de travail."
     end
   end
 end

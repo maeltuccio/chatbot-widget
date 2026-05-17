@@ -1,8 +1,8 @@
 <section class="page-header">
   <div>
-    <span class="eyebrow">Account</span>
-    <h1 class="page-title">Create your workspace</h1>
-    <p class="page-description">Create an owner account to manage agents, Webflow connections, and knowledge sources.</p>
+    <span class="eyebrow">Compte</span>
+    <h1 class="page-title">Créer votre espace de travail</h1>
+    <p class="page-description">Créez un compte propriétaire pour gérer les agents, les connexions Webflow et les sources de connaissance.</p>
   </div>
 </section>
 
@@ -12,7 +12,7 @@
       <%= render "devise/shared/error_messages", resource: resource %>
 
       <div class="field">
-        <%= form.label :account_name, "Workspace name" %>
+        <%= form.label :account_name, "Nom de l'espace de travail" %>
         <%= form.text_field :account_name, autofocus: true, autocomplete: "organization" %>
       </div>
 
@@ -22,23 +22,22 @@
       </div>
 
       <div class="field">
-        <%= form.label :password %>
+        <%= form.label :password, "Mot de passe" %>
         <%= form.password_field :password, autocomplete: "new-password" %>
         <% if @minimum_password_length %>
-          <p class="field-hint"><%= @minimum_password_length %> characters minimum.</p>
+          <p class="field-hint"><%= @minimum_password_length %> caractères minimum.</p>
         <% end %>
       </div>
 
       <div class="field">
-        <%= form.label :password_confirmation %>
+        <%= form.label :password_confirmation, "Confirmation du mot de passe" %>
         <%= form.password_field :password_confirmation, autocomplete: "new-password" %>
       </div>
 
       <div class="actions">
-        <%= form.submit "Create account", class: "btn btn-primary" %>
-        <%= link_to "Sign in", new_session_path(resource_name), class: "btn" %>
+        <%= form.submit "Créer le compte", class: "btn btn-primary" %>
+        <%= link_to "Se connecter", new_session_path(resource_name), class: "btn" %>
       </div>
     <% end %>
   </div>
 </section>
-

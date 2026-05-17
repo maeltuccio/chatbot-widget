@@ -2,14 +2,14 @@
   <div>
     <span class="eyebrow">Agent</span>
     <h1 class="page-title"><%= @agent.name %></h1>
-    <p class="page-description"><%= @agent.primary_goal.presence || "No primary goal configured yet." %></p>
+    <p class="page-description"><%= @agent.primary_goal.presence || "Aucun objectif principal configuré pour le moment." %></p>
   </div>
 
   <div class="actions">
     <%= link_to "Conversations", agent_conversations_path(@agent), class: "btn" %>
-    <%= link_to "Knowledge", agent_knowledge_sources_path(@agent), class: "btn" %>
+    <%= link_to "Connaissance", agent_knowledge_sources_path(@agent), class: "btn" %>
     <%= link_to "Webflow", agent_webflow_connection_path(@agent), class: "btn" %>
-    <%= link_to "Edit", edit_agent_path(@agent), class: "btn btn-primary" %>
+    <%= link_to "Modifier", edit_agent_path(@agent), class: "btn btn-primary" %>
   </div>
 </section>
 
@@ -20,11 +20,11 @@
   </div>
   <div class="stat-card">
     <strong><%= @agent.knowledge_sources.count %></strong>
-    <span>Knowledge sources</span>
+    <span>Sources de connaissance</span>
   </div>
   <div class="stat-card">
-    <strong><%= @agent.active? ? "Live" : "Off" %></strong>
-    <span>Widget status</span>
+    <strong><%= widget_status_label(@agent) %></strong>
+    <span>Statut du widget</span>
   </div>
 </section>
 
@@ -34,20 +34,20 @@
       <h2 class="section-title">Configuration</h2>
       <div class="detail-list">
         <div class="detail-row">
-          <span class="detail-label">Public token</span>
+          <span class="detail-label">Jeton public</span>
           <span><code><%= @agent.public_token %></code></span>
         </div>
         <div class="detail-row">
-          <span class="detail-label">Welcome</span>
+          <span class="detail-label">Message d'accueil</span>
           <span><%= @agent.welcome_message %></span>
         </div>
         <div class="detail-row">
-          <span class="detail-label">Tone</span>
-          <span><%= @agent.tone.presence || "Not set" %></span>
+          <span class="detail-label">Ton</span>
+          <span><%= @agent.tone.presence || "Non défini" %></span>
         </div>
         <div class="detail-row">
-          <span class="detail-label">Status</span>
-          <span class="badge <%= @agent.active? ? "badge-success" : "badge-warning" %>"><%= @agent.active? ? "Active" : "Inactive" %></span>
+          <span class="detail-label">Statut</span>
+          <span class="badge <%= @agent.active? ? "badge-success" : "badge-warning" %>"><%= agent_status_label(@agent) %></span>
         </div>
       </div>
     </div>
@@ -58,15 +58,15 @@
       <h2 class="section-title">Widget</h2>
       <div class="detail-list">
         <div class="detail-row">
-          <span class="detail-label">Title</span>
+          <span class="detail-label">Titre</span>
           <span><%= @agent.widget_title %></span>
         </div>
         <div class="detail-row">
-          <span class="detail-label">Show title</span>
-          <span><%= @agent.widget_show_title? ? "Yes" : "No" %></span>
+          <span class="detail-label">Afficher le titre</span>
+          <span><%= yes_no_label(@agent.widget_show_title?) %></span>
         </div>
         <div class="detail-row">
-          <span class="detail-label">Primary color</span>
+          <span class="detail-label">Couleur principale</span>
           <span><%= @agent.widget_primary_color %></span>
         </div>
         <div class="detail-row">
@@ -74,16 +74,16 @@
           <span><%= @agent.widget_position %></span>
         </div>
         <div class="detail-row">
-          <span class="detail-label">Layout</span>
-          <span><%= @agent.widget_theme %></span>
+          <span class="detail-label">Thème</span>
+          <span><%= widget_theme_label(@agent.widget_theme) %></span>
         </div>
         <div class="detail-row">
           <span class="detail-label">Placeholder</span>
           <span><%= @agent.widget_placeholder %></span>
         </div>
         <div class="detail-row">
-          <span class="detail-label">Allowed domains</span>
-          <span><%= @agent.allowed_origin_list.presence&.join(", ") || "Development only" %></span>
+          <span class="detail-label">Domaines autorisés</span>
+          <span><%= @agent.allowed_origin_list.presence&.join(", ") || "Développement uniquement" %></span>
         </div>
       </div>
     </div>
@@ -93,54 +93,55 @@
 <section class="grid">
   <article class="card">
     <div class="card-body">
-      <h2 class="section-title">Webflow CMS</h2>
+      <h2 class="section-title">CMS Webflow</h2>
       <% if @agent.webflow_connection.present? %>
         <% connection = @agent.webflow_connection %>
         <div class="detail-list">
           <div class="detail-row">
-            <span class="detail-label">Status</span>
-            <span class="badge <%= connection.configured? ? "badge-success" : "badge-warning" %>"><%= connection.status %></span>
+            <span class="detail-label">Statut</span>
+            <span class="badge <%= connection.configured? ? "badge-success" : "badge-warning" %>"><%= connection_status_label(connection.status) %></span>
           </div>
           <div class="detail-row">
             <span class="detail-label">Collection</span>
-            <span><%= connection.collection_name.presence || connection.collection_id.presence || "Not selected" %></span>
+            <span><%= connection.collection_name.presence || connection.collection_id.presence || "Non sélectionnée" %></span>
           </div>
           <div class="detail-row">
-            <span class="detail-label">Last sync</span>
-            <span><%= connection.last_synced_at.present? ? l(connection.last_synced_at, format: :short) : "Never" %></span>
+            <span class="detail-label">Dernière synchro</span>
+            <span><%= connection.last_synced_at.present? ? l(connection.last_synced_at, format: :short) : "Jamais" %></span>
           </div>
         </div>
         <div class="actions form-actions">
-          <%= link_to "Configure Webflow", agent_webflow_connection_path(@agent), class: "btn" %>
-          <%= button_to "Sync now", sync_agent_webflow_connection_path(@agent), method: :post, class: "btn btn-primary", disabled: !connection.syncable? %>
+          <%= link_to "Configurer Webflow", agent_webflow_connection_path(@agent), class: "btn" %>
+          <%= button_to "Synchroniser", sync_agent_webflow_connection_path(@agent), method: :post, class: "btn btn-primary", disabled: !connection.syncable? %>
         </div>
       <% else %>
-        <p class="muted">Connect this agent to a Webflow CMS collection and sync the services into its knowledge base.</p>
-        <%= link_to "Connect Webflow", connect_agent_webflow_connection_path(@agent), class: "btn btn-primary" %>
+        <p class="muted">Connectez cet agent à une collection CMS Webflow et synchronisez les services dans sa base de connaissance.</p>
+        <%= link_to "Connecter Webflow", connect_agent_webflow_connection_path(@agent), class: "btn btn-primary" %>
       <% end %>
     </div>
   </article>
 
   <article class="card">
     <div class="card-body">
-      <h2 class="section-title">Integration script</h2>
-      <pre class="code-block"><code>&lt;script src="http://localhost:3000/widget.js" data-agent-token="<%= @agent.public_token %>"&gt;&lt;/script&gt;</code></pre>
+      <h2 class="section-title">Script d'intégration</h2>
+      <% widget_host = ENV["APP_HOST"].presence || request.base_url %>
+      <pre class="code-block"><code>&lt;script src="<%= "#{widget_host.chomp("/")}/widget.js" %>" data-agent-token="<%= @agent.public_token %>"&gt;&lt;/script&gt;</code></pre>
     </div>
   </article>
 
   <article class="card">
     <div class="card-body">
-      <h2 class="section-title">System prompt</h2>
+      <h2 class="section-title">Prompt système</h2>
       <pre><%= @agent.system_prompt %></pre>
     </div>
   </article>
 
   <div class="actions">
-    <%= link_to "Back to agents", agents_path, class: "btn" %>
-    <%= button_to "Delete agent",
+    <%= link_to "Retour aux agents", agents_path, class: "btn" %>
+    <%= button_to "Supprimer l'agent",
       agent_path(@agent),
       method: :delete,
       class: "danger-button",
-      form: { data: { turbo_confirm: "Delete #{@agent.name}? This will also delete its conversations and knowledge sources." } } %>
+      form: { data: { turbo_confirm: "Supprimer #{@agent.name} ? Cela supprimera aussi ses conversations et ses sources de connaissance." } } %>
   </div>
 </section>

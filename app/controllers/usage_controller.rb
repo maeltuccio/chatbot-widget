@@ -17,10 +17,10 @@ class UsageController < ApplicationController
 
   def update_limits
     if current_account.update(usage_limit_params)
-      redirect_to usage_path, notice: "Usage limits updated."
+      redirect_to usage_path, notice: "Les limites d'utilisation ont été mises à jour."
     else
       load_usage
-      flash.now[:alert] = "Usage limits could not be updated."
+      flash.now[:alert] = "Les limites d'utilisation n'ont pas pu être mises à jour."
       render :index, status: :unprocessable_entity
     end
   end
@@ -62,16 +62,16 @@ class UsageController < ApplicationController
   def usage_csv(events)
     CSV.generate(headers: true) do |csv|
       csv << [
-        "time",
+        "date",
         "agent",
         "type",
-        "model",
-        "input_tokens",
-        "output_tokens",
-        "total_tokens",
-        "input_characters",
-        "output_characters",
-        "estimated_tokens"
+        "modele",
+        "tokens_entree",
+        "tokens_sortie",
+        "tokens_total",
+        "caracteres_entree",
+        "caracteres_sortie",
+        "tokens_estimes"
       ]
 
       events.each do |event|

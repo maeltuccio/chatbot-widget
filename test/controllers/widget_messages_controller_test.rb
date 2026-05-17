@@ -19,6 +19,6 @@ class WidgetMessagesControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_response :payment_required
-    assert_equal "Monthly AI reply limit reached for this workspace.", response.parsed_body["error"]
+    assert_equal "La limite mensuelle de réponses IA est atteinte pour cet espace de travail.", response.parsed_body["error"]
   end
 end

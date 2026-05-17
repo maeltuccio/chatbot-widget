@@ -1,6 +1,6 @@
 <% if resource.errors.any? %>
   <div class="error-box">
-    <strong><%= pluralize(resource.errors.count, "error") %> prevented this account from being saved.</strong>
+    <strong><%= pluralize(resource.errors.count, "erreur") %> empêche(nt) l'enregistrement de ce compte.</strong>
     <ul>
       <% resource.errors.full_messages.each do |message| %>
         <li><%= message %></li>

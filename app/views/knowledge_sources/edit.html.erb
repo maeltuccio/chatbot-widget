@@ -1,13 +1,13 @@
 <section class="page-header">
   <div>
-    <span class="eyebrow">Knowledge</span>
+    <span class="eyebrow">Connaissance</span>
     <h1 class="page-title"><%= @knowledge_source.title %></h1>
-    <p class="page-description">Editing this source rebuilds its chunks after save.</p>
+    <p class="page-description">Modifier cette source reconstruit ses morceaux après enregistrement.</p>
   </div>
 
   <div class="actions">
-    <%= link_to "Open source", agent_knowledge_source_path(@agent, @knowledge_source), class: "btn" %>
-    <%= link_to "Back", agent_knowledge_sources_path(@agent), class: "btn" %>
+    <%= link_to "Ouvrir la source", agent_knowledge_source_path(@agent, @knowledge_source), class: "btn" %>
+    <%= link_to "Retour", agent_knowledge_sources_path(@agent), class: "btn" %>
   </div>
 </section>
 

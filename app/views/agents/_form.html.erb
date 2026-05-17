@@ -1,6 +1,6 @@
 <% if agent.errors.any? %>
   <div class="error-box">
-    <strong><%= pluralize(agent.errors.count, "error") %> prevented this agent from being saved.</strong>
+    <strong><%= pluralize(agent.errors.count, "erreur") %> empêche(nt) l'enregistrement de cet agent.</strong>
     <ul>
       <% agent.errors.full_messages.each do |message| %>
         <li><%= message %></li>
@@ -25,53 +25,53 @@
       <div class="field">
         <%= form.label :tone %>
         <% tone_options = [
-          "Friendly and concise",
-          "Professional and reassuring",
-          "Warm and conversational",
-          "Expert and precise",
-          "Direct and sales-focused",
-          "Calm and supportive",
-          "Premium and polished"
+          "Amical et concis",
+          "Professionnel et rassurant",
+          "Chaleureux et conversationnel",
+          "Expert et précis",
+          "Direct et orienté vente",
+          "Calme et aidant",
+          "Premium et soigné"
         ] %>
         <%= select_tag :tone_template,
           options_for_select(tone_options, agent.tone),
-          include_blank: "Choose a predefined tone",
+          include_blank: "Choisir un ton prédéfini",
           data: {
             action: "agent-template#select",
             agent_template_target: "select"
           } %>
         <%= form.text_field :tone,
-          placeholder: "Or write a custom tone",
+          placeholder: "Ou écrire un ton personnalisé",
           data: {
             agent_template_target: "input"
           } %>
-        <p class="field-hint">Choose a tone, then edit it if the chatbot needs a more specific voice.</p>
+        <p class="field-hint">Choisissez un ton, puis adaptez-le si le chatbot a besoin d'une voix plus précise.</p>
       </div>
 
       <div class="field">
         <%= form.label :primary_goal %>
         <% primary_goal_options = [
-          "Answer customer questions",
-          "Qualify leads and collect contact details",
-          "Recommend the right service or offer",
-          "Help visitors book an appointment",
-          "Support customers after purchase",
-          "Explain pricing and plans",
-          "Guide visitors through onboarding"
+          "Répondre aux questions des clients",
+          "Qualifier les prospects et collecter leurs coordonnées",
+          "Recommander le bon service ou la bonne offre",
+          "Aider les visiteurs à réserver un rendez-vous",
+          "Accompagner les clients après achat",
+          "Expliquer les prix et les offres",
+          "Guider les visiteurs pendant l'onboarding"
         ] %>
         <%= select_tag :primary_goal_template,
           options_for_select(primary_goal_options, agent.primary_goal),
-          include_blank: "Choose a predefined goal",
+          include_blank: "Choisir un objectif prédéfini",
           data: {
             action: "agent-template#select",
             agent_template_target: "select"
           } %>
         <%= form.text_field :primary_goal,
-          placeholder: "Or write a custom goal",
+          placeholder: "Ou écrire un objectif personnalisé",
           data: {
             agent_template_target: "input"
           } %>
-        <p class="field-hint">Choose a goal, then edit the text if you need something more specific.</p>
+        <p class="field-hint">Choisissez un objectif, puis adaptez le texte si nécessaire.</p>
       </div>
 
       <div class="field">
@@ -80,7 +80,7 @@
       </div>
 
       <fieldset class="form-grid">
-        <legend>Widget customization</legend>
+        <legend>Personnalisation du widget</legend>
 
         <div class="field">
           <%= form.label :widget_title %>
@@ -89,7 +89,7 @@
 
         <div class="check-field">
           <%= form.check_box :widget_show_title %>
-          <%= form.label :widget_show_title, "Show chatbot name" %>
+          <%= form.label :widget_show_title, "Afficher le nom du chatbot" %>
         </div>
 
         <div class="field">
@@ -98,12 +98,12 @@
         </div>
 
         <div class="field">
-          <%= form.label :widget_theme, "Widget layout" %>
+          <%= form.label :widget_theme, "Thème du widget" %>
           <div class="theme-options">
             <% [
-              ["Glass", "glass", "Translucent panel with soft blur"],
-              ["Light", "light", "Clean white support widget"],
-              ["Dark", "dark", "High contrast dark interface"]
+              ["Verre", "glass", "Panneau translucide avec flou doux"],
+              ["Clair", "light", "Widget de support blanc et lisible"],
+              ["Sombre", "dark", "Interface sombre à fort contraste"]
             ].each do |label, value, description| %>
               <label class="theme-option">
                 <%= form.radio_button :widget_theme,
@@ -127,7 +127,7 @@
 
         <div class="field">
           <%= form.label :widget_position %>
-          <%= form.select :widget_position, [["Bottom right", "bottom_right"], ["Bottom left", "bottom_left"]] %>
+          <%= form.select :widget_position, widget_position_options %>
         </div>
 
         <div class="field">
@@ -141,9 +141,9 @@
         </div>
 
         <div class="field">
-          <%= form.label :allowed_origins, "Allowed widget domains" %>
+          <%= form.label :allowed_origins, "Domaines autorisés pour le widget" %>
           <%= form.text_area :allowed_origins, rows: 3, placeholder: "https://example.com\nhttps://www.example.com" %>
-          <p class="field-hint">One domain per line. Leave blank only for local development.</p>
+          <p class="field-hint">Un domaine par ligne. Laissez vide uniquement en développement local.</p>
         </div>
       </fieldset>
 

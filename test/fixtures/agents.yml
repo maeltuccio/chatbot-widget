@@ -14,8 +14,8 @@ one:
   widget_position: bottom_right
   widget_theme: glass
   widget_show_title: true
-  widget_send_label: Send
-  widget_placeholder: Type your message...
+  widget_send_label: Envoyer
+  widget_placeholder: Écrivez votre message...
 
 two:
   account: two
@@ -31,5 +31,5 @@ two:
   widget_position: bottom_right
   widget_theme: glass
   widget_show_title: true
-  widget_send_label: Send
-  widget_placeholder: Type your message...
+  widget_send_label: Envoyer
+  widget_placeholder: Écrivez votre message...

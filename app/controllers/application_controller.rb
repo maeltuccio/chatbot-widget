@@ -13,7 +13,7 @@ class ApplicationController < ActionController::Base
   def require_manager!
     return if current_user&.can_manage?
 
-    redirect_to agents_path, alert: "You are not allowed to manage this workspace."
+    redirect_to agents_path, alert: "Vous n'êtes pas autorisé à administrer cet espace de travail."
   end
 
   def configure_permitted_parameters

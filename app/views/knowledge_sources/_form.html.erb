@@ -1,6 +1,6 @@
 <% if knowledge_source.errors.any? %>
   <div class="error-box">
-    <strong><%= pluralize(knowledge_source.errors.count, "error") %> prevented this source from being saved.</strong>
+    <strong><%= pluralize(knowledge_source.errors.count, "erreur") %> empêche(nt) l'enregistrement de cette source.</strong>
     <ul>
       <% knowledge_source.errors.full_messages.each do |message| %>
         <li><%= message %></li>
@@ -18,9 +18,9 @@
       </div>
 
       <div class="field">
-        <%= form.label :raw_content, "Content" %>
+        <%= form.label :raw_content, "Contenu" %>
         <%= form.text_area :raw_content, rows: 18 %>
-        <p class="field-hint">Content is chunked automatically after saving.</p>
+        <p class="field-hint">Le contenu est découpé automatiquement après l'enregistrement.</p>
       </div>
 
       <div class="actions">

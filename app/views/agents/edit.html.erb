@@ -1,13 +1,13 @@
 <section class="page-header">
   <div>
-    <span class="eyebrow">Edit</span>
+    <span class="eyebrow">Modification</span>
     <h1 class="page-title"><%= @agent.name %></h1>
-    <p class="page-description">Update behavior, knowledge-facing instructions and widget settings.</p>
+    <p class="page-description">Mettez à jour le comportement, les consignes de connaissance et les réglages du widget.</p>
   </div>
 
   <div class="actions">
-    <%= link_to "Open agent", agent_path(@agent), class: "btn" %>
-    <%= link_to "Back", agents_path, class: "btn" %>
+    <%= link_to "Ouvrir l'agent", agent_path(@agent), class: "btn" %>
+    <%= link_to "Retour", agents_path, class: "btn" %>
   </div>
 </section>
 
@@ -18,15 +18,15 @@
 
   <aside class="card agent-editor-playground">
     <div class="card-body">
-      <h2 class="section-title">Playground</h2>
+      <h2 class="section-title">Aperçu</h2>
       <iframe
         class="chatbot-playground-frame"
         src="<%= playground_agent_path(@agent) %>"
-        title="Chatbot playground for <%= @agent.name %>"
+        title="Aperçu du chatbot pour <%= @agent.name %>"
         data-agent-playground-target="frame"></iframe>
       <div class="actions chatbot-playground-actions">
         <button type="button" class="btn btn-primary" data-action="agent-playground#refresh">
-          Update chatbot preview
+          Mettre à jour l'aperçu
         </button>
       </div>
       <p class="field-hint" data-agent-playground-target="status" role="status" aria-live="polite"></p>

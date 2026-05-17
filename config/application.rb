@@ -25,5 +25,6 @@ module ChatbotSaas
     # config.eager_load_paths << Rails.root.join("extras")
     config.active_record.schema_format = :sql
     config.middleware.use Rack::Attack
+    config.i18n.default_locale = :fr
   end
 end

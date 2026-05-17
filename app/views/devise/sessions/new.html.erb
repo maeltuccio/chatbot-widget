@@ -1,8 +1,8 @@
 <section class="page-header">
   <div>
-    <span class="eyebrow">Backoffice</span>
-    <h1 class="page-title">Sign in</h1>
-    <p class="page-description">Access your workspace to manage agents, knowledge, and integrations.</p>
+    <span class="eyebrow">Administration</span>
+    <h1 class="page-title">Connexion</h1>
+    <p class="page-description">Accédez à votre espace de travail pour gérer les agents, la connaissance et les intégrations.</p>
   </div>
 </section>
 
@@ -15,19 +15,19 @@
       </div>
 
       <div class="field">
-        <%= form.label :password %>
+        <%= form.label :password, "Mot de passe" %>
         <%= form.password_field :password, autocomplete: "current-password" %>
       </div>
 
       <% if devise_mapping.rememberable? %>
         <div class="check-field">
           <%= form.check_box :remember_me %>
-          <%= form.label :remember_me %>
+          <%= form.label :remember_me, "Se souvenir de moi" %>
         </div>
       <% end %>
 
       <div class="actions">
-        <%= form.submit "Sign in", class: "btn btn-primary" %>
+        <%= form.submit "Se connecter", class: "btn btn-primary" %>
       </div>
     <% end %>
   </div>

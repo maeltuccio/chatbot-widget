@@ -58,7 +58,7 @@ class UsageControllerTest < ActionDispatch::IntegrationTest
     assert_equal 1, csv.length
     assert_equal agent.name, csv.first["agent"]
     assert_equal "message", csv.first["type"]
-    assert_equal "gpt-4o-mini", csv.first["model"]
-    assert_equal "30", csv.first["total_tokens"]
+    assert_equal "gpt-4o-mini", csv.first["modele"]
+    assert_equal "30", csv.first["tokens_total"]
   end
 end
