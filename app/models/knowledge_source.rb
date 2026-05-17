@@ -20,11 +20,20 @@ class KnowledgeSource < ApplicationRecord
       knowledge_chunks.destroy_all
 
       build_chunks.each_with_index do |content, index|
+        embedding = KnowledgeEmbedding.embed(content)
+        UsageEvent.record_embedding!(
+          agent: agent,
+          knowledge_source: self,
+          content: content,
+          embedding: embedding
+        )
+
         knowledge_chunks.create!(
           agent: agent,
           content: content,
           position: index,
-          embedding_model: KnowledgeChunk::EMBEDDING_MODEL
+          embedding_model: KnowledgeChunk::EMBEDDING_MODEL,
+          embedding: KnowledgeEmbedding.vector_to_database(KnowledgeEmbedding.embedding_vector(embedding))
         )
       end
 

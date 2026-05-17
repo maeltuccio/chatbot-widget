@@ -15,7 +15,7 @@ class ConversationsController < ApplicationController
   private
 
   def set_agent
-    @agent = Agent.find(params[:agent_id])
+    @agent = current_account.agents.find(params[:agent_id])
   end
 
   def set_conversation

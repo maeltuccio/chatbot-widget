@@ -26,8 +26,17 @@ gem "stimulus-rails"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 
+# Generate billable usage exports
+gem "csv"
+
 # Unified LLM client for chat responses
 gem "ruby_llm"
+
+# Authentication for the backoffice
+gem "devise", "~> 4.9"
+
+# Throttle public endpoints and authentication attempts
+gem "rack-attack", "~> 6.8"
 
 # Use Redis adapter to run Action Cable in production
 # gem "redis", ">= 4.0.1"
@@ -65,6 +74,8 @@ group :development do
 end
 
 group :test do
+  gem "minitest", "~> 5.25"
+
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
   gem "capybara"
   gem "selenium-webdriver"

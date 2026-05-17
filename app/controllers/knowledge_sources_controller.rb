@@ -1,4 +1,5 @@
 class KnowledgeSourcesController < ApplicationController
+  before_action :require_manager!, except: [:index, :show]
   before_action :set_agent
   before_action :set_knowledge_source, only: [:show, :edit, :update, :destroy]
 
@@ -49,7 +50,7 @@ class KnowledgeSourcesController < ApplicationController
   private
 
   def set_agent
-    @agent = Agent.find(params[:agent_id])
+    @agent = current_account.agents.find(params[:agent_id])
   end
 
   def set_knowledge_source

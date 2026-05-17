@@ -1,6 +1,7 @@
 class WebflowConnectionsController < ApplicationController
   WEBFLOW_SCOPES = %w[sites:read cms:read].freeze
 
+  before_action :require_manager!, except: :callback
   before_action :set_agent, except: :callback
   before_action :set_connection, only: [:show, :update, :sync, :destroy]
 
@@ -35,7 +36,7 @@ class WebflowConnectionsController < ApplicationController
   end
 
   def callback
-    @agent = Agent.find(session[:webflow_oauth_agent_id])
+    @agent = current_account.agents.find(session[:webflow_oauth_agent_id])
 
     unless valid_oauth_state?
       redirect_to agent_path(@agent), alert: "Webflow connection could not be verified. Please try again."
@@ -94,7 +95,8 @@ class WebflowConnectionsController < ApplicationController
       agent: @agent,
       collection_id: @connection.collection_id,
       client: webflow_client,
-      source_title: "Webflow Services"
+      source_title: webflow_source_title,
+      source: existing_webflow_source
     ).call
 
     @connection.update!(
@@ -119,7 +121,7 @@ class WebflowConnectionsController < ApplicationController
   private
 
   def set_agent
-    @agent = Agent.find(params[:agent_id])
+    @agent = current_account.agents.find(params[:agent_id])
   end
 
   def set_connection
@@ -154,5 +156,16 @@ class WebflowConnectionsController < ApplicationController
     return webflow_oauth_callback_url if ENV["APP_HOST"].blank?
 
     "#{ENV.fetch("APP_HOST").chomp("/")}/webflow/oauth/callback"
+  end
+
+  def webflow_source_title
+    name = @connection.collection_name.presence || @connection.collection_id
+    "Webflow - #{name}"
+  end
+
+  def existing_webflow_source
+    source_id = @connection.metadata["last_source_id"]
+    @agent.knowledge_sources.find_by(id: source_id) ||
+      @agent.knowledge_sources.find_by(title: "Webflow Services")
   end
 end

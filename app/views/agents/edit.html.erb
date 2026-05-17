@@ -11,4 +11,25 @@
   </div>
 </section>
 
-<%= render "form", agent: @agent %>
+<section class="agent-editor-layout" data-controller="agent-playground agent-template">
+  <div class="agent-editor-form">
+    <%= render "form", agent: @agent %>
+  </div>
+
+  <aside class="card agent-editor-playground">
+    <div class="card-body">
+      <h2 class="section-title">Playground</h2>
+      <iframe
+        class="chatbot-playground-frame"
+        src="<%= playground_agent_path(@agent) %>"
+        title="Chatbot playground for <%= @agent.name %>"
+        data-agent-playground-target="frame"></iframe>
+      <div class="actions chatbot-playground-actions">
+        <button type="button" class="btn btn-primary" data-action="agent-playground#refresh">
+          Update chatbot preview
+        </button>
+      </div>
+      <p class="field-hint" data-agent-playground-target="status" role="status" aria-live="polite"></p>
+    </div>
+  </aside>
+</section>

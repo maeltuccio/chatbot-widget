@@ -1,0 +1,153 @@
+<section class="page-header">
+  <div>
+    <span class="eyebrow">Usage</span>
+    <h1 class="page-title">Usage dashboard</h1>
+    <p class="page-description">Track AI replies, embeddings and token usage across this workspace.</p>
+  </div>
+
+  <div class="actions">
+    <%= link_to "Export billable CSV", usage_path(format: :csv), class: "btn btn-primary" %>
+  </div>
+</section>
+
+<section class="stats-grid usage-stats-grid">
+  <div class="stat-card">
+    <strong><%= @message_usage.count %></strong>
+    <span>AI replies this month</span>
+  </div>
+  <div class="stat-card">
+    <strong><%= number_with_delimiter(@message_usage.sum(:total_tokens)) %></strong>
+    <span>Message tokens</span>
+  </div>
+  <div class="stat-card">
+    <strong><%= @embedding_usage.count %></strong>
+    <span>Embeddings generated</span>
+  </div>
+  <div class="stat-card">
+    <strong><%= number_with_delimiter(@usage_events.sum(:total_tokens)) %></strong>
+    <span>Total tokens</span>
+  </div>
+</section>
+
+<section class="grid grid-two">
+  <article class="card">
+    <div class="card-body">
+      <h2 class="section-title">Monthly limits</h2>
+      <div class="detail-list">
+        <div class="detail-row">
+          <span class="detail-label">AI replies</span>
+          <span>
+            <%= current_account.monthly_message_limit.present? ? "#{number_with_delimiter(@message_limit_remaining)} remaining / #{number_with_delimiter(current_account.monthly_message_limit)}" : "Unlimited" %>
+          </span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Total tokens</span>
+          <span>
+            <%= current_account.monthly_token_limit.present? ? "#{number_with_delimiter(@token_limit_remaining)} remaining / #{number_with_delimiter(current_account.monthly_token_limit)}" : "Unlimited" %>
+          </span>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <% if current_user.can_manage? %>
+    <article class="card">
+      <div class="card-body">
+        <h2 class="section-title">Set limits</h2>
+        <%= form_with(model: current_account, url: usage_limits_path, method: :patch, class: "form-grid") do |form| %>
+          <div class="field">
+            <%= form.label :monthly_message_limit, "Monthly AI replies" %>
+            <%= form.number_field :monthly_message_limit, min: 0, placeholder: "Unlimited" %>
+          </div>
+
+          <div class="field">
+            <%= form.label :monthly_token_limit, "Monthly tokens" %>
+            <%= form.number_field :monthly_token_limit, min: 0, placeholder: "Unlimited" %>
+          </div>
+
+          <div class="actions">
+            <%= form.submit "Save limits", class: "btn btn-primary" %>
+          </div>
+        <% end %>
+      </div>
+    </article>
+  <% end %>
+</section>
+
+<section class="grid grid-two">
+  <article class="card">
+    <div class="card-body">
+      <h2 class="section-title">Usage by agent</h2>
+      <% if @usage_by_agent.present? %>
+        <div class="usage-agent-list">
+          <% @usage_by_agent.each do |agent_name, event_count| %>
+            <div class="detail-row">
+              <span class="detail-label"><%= agent_name %></span>
+              <span>
+                <%= pluralize(event_count, "event") %>
+                · <%= number_with_delimiter(@tokens_by_agent[agent_name].to_i) %> tokens
+              </span>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="muted">No usage has been tracked this month.</p>
+      <% end %>
+    </div>
+  </article>
+
+  <article class="card">
+    <div class="card-body">
+      <h2 class="section-title">Event mix</h2>
+      <div class="detail-list">
+        <div class="detail-row">
+          <span class="detail-label">Messages</span>
+          <span><%= pluralize(@message_usage.count, "event") %></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Embeddings</span>
+          <span><%= pluralize(@embedding_usage.count, "event") %></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Estimated events</span>
+          <span><%= @usage_events.where("metadata ->> 'estimated_tokens' = ?", "true").count %></span>
+        </div>
+      </div>
+    </div>
+  </article>
+</section>
+
+<section class="table-wrap usage-events-table">
+  <table>
+    <thead>
+      <tr>
+        <th>Time</th>
+        <th>Agent</th>
+        <th>Type</th>
+        <th>Model</th>
+        <th>Input</th>
+        <th>Output</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if @recent_usage_events.present? %>
+        <% @recent_usage_events.each do |event| %>
+          <tr>
+            <td><%= l(event.created_at, format: :short) %></td>
+            <td><%= event.agent.name %></td>
+            <td><span class="badge"><%= event.event_type %></span></td>
+            <td><%= event.model.presence || "Unknown" %></td>
+            <td><%= number_with_delimiter(event.input_tokens) %></td>
+            <td><%= number_with_delimiter(event.output_tokens) %></td>
+            <td><%= number_with_delimiter(event.total_tokens) %></td>
+          </tr>
+        <% end %>
+      <% else %>
+        <tr>
+          <td colspan="7" class="empty-state">No usage events yet.</td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</section>

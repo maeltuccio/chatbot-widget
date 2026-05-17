@@ -1,0 +1,12 @@
+one:
+  account: one
+  email: owner@example.com
+  encrypted_password: <%= Devise::Encryptor.digest(User, "password123") %>
+  role: owner
+
+two:
+  account: two
+  email: member@example.com
+  encrypted_password: <%= Devise::Encryptor.digest(User, "password123") %>
+  role: member
+# column: value

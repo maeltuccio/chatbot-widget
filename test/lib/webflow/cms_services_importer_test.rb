@@ -35,7 +35,7 @@ module Webflow
       source = agent.knowledge_sources.find_by!(title: "Webflow Services")
       assert_equal "ready", source.status
       assert_equal 1, source.knowledge_chunks.count
-      assert_includes source.raw_content, "Service: Installation de pompes à chaleur"
+      assert_includes source.raw_content, "CMS item: Installation de pompes à chaleur"
       assert_includes source.raw_content, "Offre: Notre offre Analyse et mise en service."
       assert_not_includes source.raw_content, "<h2>"
       assert_equal 0, other_agent.knowledge_sources.where(title: "Webflow Services").count

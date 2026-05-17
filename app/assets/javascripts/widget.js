@@ -3,6 +3,7 @@
     var config = window.ChatbotSaasWidgetConfig;
     var agentToken = config && config.agentToken;
     var baseUrl = config && config.baseUrl;
+    var autoOpen = config && config.autoOpen;
 
     if (!agentToken || !baseUrl || document.getElementById("chatbot-saas-widget")) {
       return;
@@ -23,13 +24,13 @@
     container.className = "chatbot-saas-position-bottom-right";
 
     var panel = document.createElement("div");
-    panel.className = "chatbot-saas-panel";
+    panel.className = autoOpen ? "chatbot-saas-panel chatbot-saas-panel-open" : "chatbot-saas-panel";
 
     var header = document.createElement("button");
     header.type = "button";
     header.className = "chatbot-saas-header";
-    header.setAttribute("aria-expanded", "false");
-    header.setAttribute("aria-label", "Open chat");
+    header.setAttribute("aria-expanded", autoOpen ? "true" : "false");
+    header.setAttribute("aria-label", autoOpen ? "Close chat" : "Open chat");
 
     var headerIcon = document.createElement("span");
     headerIcon.className = "chatbot-saas-header-icon";
@@ -44,7 +45,7 @@
     header.appendChild(headerTitle);
 
     var body = document.createElement("div");
-    body.className = "chatbot-saas-body";
+    body.className = autoOpen ? "chatbot-saas-body chatbot-saas-body-open" : "chatbot-saas-body";
 
     var messages = document.createElement("div");
     messages.className = "chatbot-saas-messages";
@@ -143,41 +144,15 @@
     }
 
     function createTypingBuffer(message) {
-      var queue = "";
-      var timer = null;
-      var delay = 14;
-
-      function flushNextCharacter() {
-        if (!queue.length) {
-          timer = null;
-          return;
-        }
-
-        appendToMessage(message, queue.charAt(0));
-        queue = queue.slice(1);
-        timer = setTimeout(flushNextCharacter, delay);
-      }
-
       return {
         push: function (text) {
-          queue += text || "";
-
-          if (!timer) {
-            flushNextCharacter();
-          }
+          appendToMessage(message, text || "");
         },
         finish: function () {
-          if (queue.length && !timer) {
-            flushNextCharacter();
-          }
+          message.classList.remove("chatbot-saas-message-typing");
         },
         clear: function () {
-          if (timer) {
-            clearTimeout(timer);
-            timer = null;
-          }
-
-          queue = "";
+          message.dataset.rawContent = "";
         }
       };
     }
@@ -321,16 +296,26 @@
       .then(function (response) { return response.json(); })
       .then(function (agent) {
         var primaryColor = agent.widget_primary_color || "#111827";
+        var theme = agent.widget_theme || "glass";
 
-        container.className = "chatbot-saas-position-" + (agent.widget_position || "bottom_right").replace("_", "-");
+        container.className = "chatbot-saas-position-" + (agent.widget_position || "bottom_right").replace("_", "-") + " chatbot-saas-theme-" + theme;
         container.style.setProperty("--chatbot-saas-primary-color", primaryColor);
         headerTitle.textContent = agent.widget_title || agent.name || "Chat";
+        headerTitle.hidden = agent.widget_show_title === false;
         submit.textContent = agent.widget_send_label || "Send";
         input.placeholder = agent.widget_placeholder || "Type your message...";
         welcome.textContent = agent.welcome_message || "Hi! How can I help you today?";
+
+        if (autoOpen) {
+          setChatOpen(true);
+        }
       })
       .catch(function () {
         welcome.textContent = "Hi! How can I help you today?";
+
+        if (autoOpen) {
+          setChatOpen(true);
+        }
       });
   }
 

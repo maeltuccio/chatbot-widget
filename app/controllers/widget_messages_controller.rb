@@ -8,11 +8,12 @@ class WidgetMessagesController < ApplicationController
   KNOWLEDGE_CHUNK_LIMIT = 6
   KNOWLEDGE_CONTEXT_MAX_CHARS = 4_000
 
+  skip_before_action :authenticate_user!
   skip_forgery_protection
   before_action :set_cors_headers
 
   def create
-    agent = Agent.find_by!(public_token: params[:agent_token], active: true)
+    agent = widget_agent!
     return unless ensure_origin_allowed!(agent)
 
     message = params[:message].to_s.strip
@@ -21,6 +22,8 @@ class WidgetMessagesController < ApplicationController
       render json: { error: "Message can't be blank." }, status: :unprocessable_entity
       return
     end
+
+    return unless ensure_usage_available!(agent)
 
     @conversation = find_or_create_conversation(agent)
     visitor_message = @conversation.messages.create!(role: "visitor", content: message)
@@ -34,9 +37,11 @@ class WidgetMessagesController < ApplicationController
       return
     end
 
-    reply = generate_reply(agent, @conversation, visitor_message)
+    response = generate_reply(agent, @conversation, visitor_message)
+    reply = response.content
     @conversation.messages.create!(role: "assistant", content: reply)
     @conversation.touch_last_message_at!
+    record_message_usage(agent, @conversation, visitor_message.content, reply, response)
 
     render json: {
       reply: reply,
@@ -53,7 +58,7 @@ class WidgetMessagesController < ApplicationController
   def stream
     set_stream_headers
 
-    agent = Agent.find_by!(public_token: params[:agent_token], active: true)
+    agent = widget_agent!
     return unless ensure_origin_allowed!(agent, stream: true)
 
     message = params[:message].to_s.strip
@@ -62,6 +67,8 @@ class WidgetMessagesController < ApplicationController
       write_sse(:error, error: "Message can't be blank.")
       return
     end
+
+    return unless ensure_usage_available!(agent, stream: true)
 
     @conversation = find_or_create_conversation(agent)
     visitor_message = @conversation.messages.create!(role: "visitor", content: message)
@@ -74,12 +81,16 @@ class WidgetMessagesController < ApplicationController
       return
     end
 
-    reply = stream_reply(agent, @conversation, visitor_message) do |delta|
+    full_reply = +""
+    response = stream_reply(agent, @conversation, visitor_message) do |delta|
+      full_reply << delta
       write_sse(:delta, content: delta)
     end
+    reply = full_reply.presence || response.content.to_s
 
     @conversation.messages.create!(role: "assistant", content: reply)
     @conversation.touch_last_message_at!
+    record_message_usage(agent, @conversation, visitor_message.content, reply, response)
     write_sse(:done, conversation_token: @conversation.public_token)
   rescue RubyLLM::Error => error
     Rails.logger.error("RubyLLM stream error: #{error.class} - #{error.message}")
@@ -94,8 +105,15 @@ class WidgetMessagesController < ApplicationController
 
   private
 
+  def widget_agent!
+    agent = Agent.find_by!(public_token: params[:agent_token])
+    return agent if agent.active? || backoffice_preview_allowed?(agent)
+
+    raise ActiveRecord::RecordNotFound
+  end
+
   def ensure_origin_allowed!(agent, stream: false)
-    return true if agent.origin_allowed?(request.origin)
+    return true if agent.origin_allowed?(request.origin) || backoffice_preview_allowed?(agent)
 
     if stream
       write_sse(:error, error: "This widget is not allowed on this domain.")
@@ -104,6 +122,27 @@ class WidgetMessagesController < ApplicationController
     end
 
     false
+  end
+
+  def ensure_usage_available!(agent, stream: false)
+    return true unless agent.account.usage_limit_reached?
+
+    if stream
+      write_sse(:error, error: agent.account.usage_limit_message)
+    else
+      render json: { error: agent.account.usage_limit_message }, status: :payment_required
+    end
+
+    false
+  end
+
+  def backoffice_preview_allowed?(agent)
+    same_backoffice_origin? && current_user&.account_id == agent.account_id
+  end
+
+  def same_backoffice_origin?
+    request.origin == request.base_url ||
+      request.referer.to_s.start_with?("#{request.base_url}/")
   end
 
   def find_or_create_conversation(agent)
@@ -116,22 +155,28 @@ class WidgetMessagesController < ApplicationController
   end
 
   def generate_reply(agent, conversation, visitor_message)
-    response = build_chat(agent, conversation, visitor_message).ask(visitor_message.content)
-    response.content
+    build_chat(agent, conversation, visitor_message).ask(visitor_message.content)
   end
 
   def stream_reply(agent, conversation, visitor_message)
-    full_reply = +""
-
-    response = build_chat(agent, conversation, visitor_message).ask(visitor_message.content) do |chunk|
+    build_chat(agent, conversation, visitor_message).ask(visitor_message.content) do |chunk|
       delta = chunk.content.to_s
       next if delta.blank?
 
-      full_reply << delta
       yield delta
     end
+  end
 
-    full_reply.presence || response.content.to_s
+  def record_message_usage(agent, conversation, input_text, output_text, response)
+    UsageEvent.record_message!(
+      agent: agent,
+      conversation: conversation,
+      input_text: input_text,
+      output_text: output_text,
+      response: response
+    )
+  rescue ActiveRecord::ActiveRecordError => error
+    Rails.logger.warn("Usage tracking skipped: #{error.class} - #{error.message}")
   end
 
   def build_chat(agent, conversation, visitor_message)
@@ -251,6 +296,36 @@ class WidgetMessagesController < ApplicationController
   end
 
   def relevant_knowledge_chunks(agent, query)
+    vector_chunks = relevant_vector_chunks(agent, query)
+    return vector_chunks if vector_chunks.present?
+
+    relevant_keyword_chunks(agent, query)
+  end
+
+  def relevant_vector_chunks(agent, query)
+    query_embedding = KnowledgeEmbedding.embed(query)
+    return [] if query_embedding.blank?
+
+    vector_sql = KnowledgeEmbedding.vector_sql(query_embedding)
+    chunks = agent.knowledge_chunks
+      .joins(:knowledge_source)
+      .where(knowledge_sources: { status: "ready" })
+      .where.not(embedding: nil)
+      .select(:id, :content, :position, :knowledge_source_id)
+      .order(Arel.sql("embedding <=> #{vector_sql}"))
+      .limit(KNOWLEDGE_CHUNK_LIMIT)
+      .to_a
+
+    fit_knowledge_context(chunks)
+  rescue RubyLLM::Error => error
+    Rails.logger.warn("Vector knowledge search skipped: #{error.class} - #{error.message}")
+    []
+  rescue ActiveRecord::StatementInvalid => error
+    Rails.logger.warn("Vector knowledge search unavailable: #{error.class} - #{error.message}")
+    []
+  end
+
+  def relevant_keyword_chunks(agent, query)
     chunks = agent.knowledge_chunks
       .joins(:knowledge_source)
       .where(knowledge_sources: { status: "ready" })

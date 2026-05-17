@@ -1,11 +1,16 @@
 class AgentsController < ApplicationController
-  before_action :set_agent, only: [:show, :edit, :update, :destroy]
+  before_action :require_manager!, except: [:index, :show]
+  before_action :set_agent, only: [:show, :playground, :edit, :update, :destroy]
 
   def index
-    @agents = Agent.order(created_at: :desc)
+    @agents = current_account.agents.order(created_at: :desc)
   end
 
   def show
+  end
+
+  def playground
+    render layout: false
   end
 
   def new
@@ -13,7 +18,7 @@ class AgentsController < ApplicationController
   end
 
   def create
-    @agent = default_account.agents.new(agent_params)
+    @agent = current_account.agents.new(agent_params)
 
     if @agent.save
       redirect_to @agent, notice: "Agent was successfully created."
@@ -27,9 +32,29 @@ class AgentsController < ApplicationController
 
   def update
     if @agent.update(agent_params)
-      redirect_to @agent, notice: "Agent was successfully updated."
+      respond_to do |format|
+        format.html do
+          flash.now[:notice] = "Agent was successfully updated."
+          render :edit, status: :ok
+        end
+
+        format.json do
+          render json: {
+            message: "Chatbot preview updated.",
+            playground_url: playground_agent_path(@agent),
+            widget_theme: @agent.widget_theme
+          }
+        end
+      end
     else
-      render :edit, status: :unprocessable_entity
+      respond_to do |format|
+        format.html { render :edit, status: :unprocessable_entity }
+        format.json do
+          render json: {
+            errors: @agent.errors.full_messages
+          }, status: :unprocessable_entity
+        end
+      end
     end
   end
 
@@ -41,7 +66,7 @@ class AgentsController < ApplicationController
   private
 
   def set_agent
-    @agent = Agent.find(params[:id])
+    @agent = current_account.agents.find(params[:id])
   end
 
   def agent_params
@@ -55,17 +80,12 @@ class AgentsController < ApplicationController
       :widget_title,
       :widget_primary_color,
       :widget_position,
+      :widget_theme,
+      :widget_show_title,
       :widget_send_label,
       :widget_placeholder,
       :allowed_origins
     )
   end
 
-  def default_account
-    Account.first || Account.create!(
-      name: "Demo Account",
-      plan: "demo",
-      owner_email: "demo@example.com"
-    )
-  end
 end

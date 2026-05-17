@@ -62,12 +62,20 @@
           <span><%= @agent.widget_title %></span>
         </div>
         <div class="detail-row">
+          <span class="detail-label">Show title</span>
+          <span><%= @agent.widget_show_title? ? "Yes" : "No" %></span>
+        </div>
+        <div class="detail-row">
           <span class="detail-label">Primary color</span>
           <span><%= @agent.widget_primary_color %></span>
         </div>
         <div class="detail-row">
           <span class="detail-label">Position</span>
           <span><%= @agent.widget_position %></span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Layout</span>
+          <span><%= @agent.widget_theme %></span>
         </div>
         <div class="detail-row">
           <span class="detail-label">Placeholder</span>

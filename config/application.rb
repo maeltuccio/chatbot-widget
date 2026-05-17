@@ -24,5 +24,6 @@ module ChatbotSaas
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
     config.active_record.schema_format = :sql
+    config.middleware.use Rack::Attack
   end
 end

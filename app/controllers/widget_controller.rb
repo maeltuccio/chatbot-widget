@@ -1,4 +1,5 @@
 class WidgetController < ApplicationController
+  skip_before_action :authenticate_user!
   skip_forgery_protection only: :show
 
   def show
@@ -14,6 +15,7 @@ class WidgetController < ApplicationController
       (function () {
         var script = document.currentScript;
         var agentToken = script && script.dataset ? script.dataset.agentToken : null;
+        var autoOpen = script && script.dataset ? script.dataset.open === "true" : false;
 
         if (!agentToken || document.getElementById("chatbot-saas-widget")) {
           return;
@@ -23,7 +25,8 @@ class WidgetController < ApplicationController
 
         window.ChatbotSaasWidgetConfig = {
           agentToken: agentToken,
-          baseUrl: baseUrl
+          baseUrl: baseUrl,
+          autoOpen: autoOpen
         };
 
         function appendAsset(tagName, attributes) {

@@ -13,6 +13,12 @@ demo_account = Account.find_or_create_by!(owner_email: "demo@example.com") do |a
   account.plan = "demo"
 end
 
+demo_account.users.find_or_create_by!(email: ENV.fetch("ADMIN_EMAIL", "admin@example.com")) do |user|
+  user.password = ENV.fetch("ADMIN_PASSWORD", "password123")
+  user.password_confirmation = ENV.fetch("ADMIN_PASSWORD", "password123")
+  user.role = "owner"
+end
+
 demo_agent = demo_account.agents.find_or_initialize_by(name: "Demo Agent")
 demo_agent.assign_attributes(
   system_prompt: "You are a helpful SaaS support assistant. Answer clearly and politely.",
@@ -33,6 +39,12 @@ neuro_account = Account.find_or_create_by!(owner_email: "contact@epilepsycourses
   account.plan = "demo"
 end
 neuro_account.update!(name: "Epilepsy Courses")
+
+neuro_account.users.find_or_create_by!(email: "epilepsy@example.com") do |user|
+  user.password = ENV.fetch("ADMIN_PASSWORD", "password123")
+  user.password_confirmation = ENV.fetch("ADMIN_PASSWORD", "password123")
+  user.role = "owner"
+end
 
 neuro_agent = Agent.find_or_initialize_by(public_token: "neuroconsulting2026")
 neuro_agent.account = neuro_account

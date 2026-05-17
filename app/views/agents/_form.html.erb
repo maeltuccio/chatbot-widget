@@ -11,7 +11,7 @@
 
 <section class="card form-card">
   <div class="card-body">
-    <%= form_with(model: agent, class: "form-grid") do |form| %>
+    <%= form_with(model: agent, url: agent.persisted? ? edit_agent_path(agent) : agents_path, method: agent.persisted? ? :patch : :post, class: "form-grid", data: { turbo: false, agent_playground_target: agent.persisted? ? "form" : nil }) do |form| %>
       <div class="field">
         <%= form.label :name %>
         <%= form.text_field :name %>
@@ -24,12 +24,54 @@
 
       <div class="field">
         <%= form.label :tone %>
-        <%= form.text_field :tone %>
+        <% tone_options = [
+          "Friendly and concise",
+          "Professional and reassuring",
+          "Warm and conversational",
+          "Expert and precise",
+          "Direct and sales-focused",
+          "Calm and supportive",
+          "Premium and polished"
+        ] %>
+        <%= select_tag :tone_template,
+          options_for_select(tone_options, agent.tone),
+          include_blank: "Choose a predefined tone",
+          data: {
+            action: "agent-template#select",
+            agent_template_target: "select"
+          } %>
+        <%= form.text_field :tone,
+          placeholder: "Or write a custom tone",
+          data: {
+            agent_template_target: "input"
+          } %>
+        <p class="field-hint">Choose a tone, then edit it if the chatbot needs a more specific voice.</p>
       </div>
 
       <div class="field">
         <%= form.label :primary_goal %>
-        <%= form.text_field :primary_goal %>
+        <% primary_goal_options = [
+          "Answer customer questions",
+          "Qualify leads and collect contact details",
+          "Recommend the right service or offer",
+          "Help visitors book an appointment",
+          "Support customers after purchase",
+          "Explain pricing and plans",
+          "Guide visitors through onboarding"
+        ] %>
+        <%= select_tag :primary_goal_template,
+          options_for_select(primary_goal_options, agent.primary_goal),
+          include_blank: "Choose a predefined goal",
+          data: {
+            action: "agent-template#select",
+            agent_template_target: "select"
+          } %>
+        <%= form.text_field :primary_goal,
+          placeholder: "Or write a custom goal",
+          data: {
+            agent_template_target: "input"
+          } %>
+        <p class="field-hint">Choose a goal, then edit the text if you need something more specific.</p>
       </div>
 
       <div class="field">
@@ -45,9 +87,42 @@
           <%= form.text_field :widget_title %>
         </div>
 
+        <div class="check-field">
+          <%= form.check_box :widget_show_title %>
+          <%= form.label :widget_show_title, "Show chatbot name" %>
+        </div>
+
         <div class="field">
           <%= form.label :widget_primary_color %>
           <%= form.color_field :widget_primary_color, value: agent.widget_primary_color.presence || "#111827" %>
+        </div>
+
+        <div class="field">
+          <%= form.label :widget_theme, "Widget layout" %>
+          <div class="theme-options">
+            <% [
+              ["Glass", "glass", "Translucent panel with soft blur"],
+              ["Light", "light", "Clean white support widget"],
+              ["Dark", "dark", "High contrast dark interface"]
+            ].each do |label, value, description| %>
+              <label class="theme-option">
+                <%= form.radio_button :widget_theme,
+                  value,
+                  checked: (agent.widget_theme.presence || "glass") == value,
+                  data: { action: "agent-playground#refresh" } %>
+                <span class="theme-option-preview theme-option-preview-<%= value %>">
+                  <span class="theme-option-header"></span>
+                  <span class="theme-option-message theme-option-message-assistant"></span>
+                  <span class="theme-option-message theme-option-message-visitor"></span>
+                  <span class="theme-option-input"></span>
+                </span>
+                <span>
+                  <strong><%= label %></strong>
+                  <small><%= description %></small>
+                </span>
+              </label>
+            <% end %>
+          </div>
         </div>
 
         <div class="field">

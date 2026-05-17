@@ -1,6 +1,7 @@
 class Conversation < ApplicationRecord
   belongs_to :agent
   has_many :messages, dependent: :destroy
+  has_many :usage_events, dependent: :nullify
   belongs_to :summarized_until_message,
     class_name: "Message",
     optional: true

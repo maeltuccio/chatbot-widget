@@ -3,19 +3,33 @@
 one:
   account: one
   name: MyString
-  public_token: MyString
+  public_token: agent_one_token
   system_prompt: MyText
   welcome_message: MyText
   tone: MyString
   primary_goal: MyString
   active: false
+  widget_title: MyString
+  widget_primary_color: "#111827"
+  widget_position: bottom_right
+  widget_theme: glass
+  widget_show_title: true
+  widget_send_label: Send
+  widget_placeholder: Type your message...
 
 two:
   account: two
   name: MyString
-  public_token: MyString
+  public_token: agent_two_token
   system_prompt: MyText
   welcome_message: MyText
   tone: MyString
   primary_goal: MyString
   active: false
+  widget_title: MyString
+  widget_primary_color: "#111827"
+  widget_position: bottom_right
+  widget_theme: glass
+  widget_show_title: true
+  widget_send_label: Send
+  widget_placeholder: Type your message...

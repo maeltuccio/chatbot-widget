@@ -22,6 +22,7 @@
 
       <nav class="app-nav" aria-label="Backoffice navigation">
         <%= link_to "Agents", agents_path, class: "app-nav-link" %>
+        <%= link_to "Usage", usage_path, class: "app-nav-link" %>
       </nav>
     </aside>
 
@@ -29,9 +30,16 @@
       <header class="topbar">
         <div>
           <span class="topbar-kicker">Workspace</span>
-          <strong>AI Operations Console</strong>
+          <strong><%= current_account&.name || "AI Operations Console" %></strong>
         </div>
-        <span class="topbar-status">Development</span>
+        <div class="actions">
+          <% if user_signed_in? %>
+            <span class="topbar-status"><%= current_user.email %></span>
+            <%= button_to "Sign out", destroy_user_session_path, method: :delete, class: "btn" %>
+          <% else %>
+            <%= link_to "Sign in", new_user_session_path, class: "btn btn-primary" %>
+          <% end %>
+        </div>
       </header>
 
       <main class="app-main">
