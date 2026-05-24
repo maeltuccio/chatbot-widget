@@ -49,29 +49,6 @@
       </div>
     </div>
   </article>
-
-  <% if current_user.can_manage? %>
-    <article class="card">
-      <div class="card-body">
-        <h2 class="section-title">Définir les limites</h2>
-        <%= form_with(model: current_account, url: usage_limits_path, method: :patch, class: "form-grid") do |form| %>
-          <div class="field">
-            <%= form.label :monthly_message_limit, "Réponses IA mensuelles" %>
-            <%= form.number_field :monthly_message_limit, min: 0, placeholder: "Illimité" %>
-          </div>
-
-          <div class="field">
-            <%= form.label :monthly_token_limit, "Tokens mensuels" %>
-            <%= form.number_field :monthly_token_limit, min: 0, placeholder: "Illimité" %>
-          </div>
-
-          <div class="actions">
-            <%= form.submit "Enregistrer les limites", class: "btn btn-primary" %>
-          </div>
-        <% end %>
-      </div>
-    </article>
-  <% end %>
 </section>
 
 <section class="grid grid-two">

@@ -326,7 +326,8 @@ CREATE TABLE public.users (
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
     account_id bigint,
-    role character varying DEFAULT 'member'::character varying NOT NULL
+    role character varying DEFAULT 'member'::character varying NOT NULL,
+    platform_admin boolean DEFAULT false NOT NULL
 );
 
 
@@ -817,6 +818,7 @@ ALTER TABLE ONLY public.knowledge_sources
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260524120000'),
 ('20260517143000'),
 ('20260516124000'),
 ('20260516123000'),

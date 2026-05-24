@@ -1,0 +1,98 @@
+<section class="page-header">
+  <div>
+    <span class="eyebrow">Administration</span>
+    <h1 class="page-title">Consommation clients</h1>
+    <p class="page-description">Pilotez les limites mensuelles et repérez rapidement les comptes qui approchent leur plafond.</p>
+  </div>
+</section>
+
+<section class="stats-grid usage-stats-grid">
+  <div class="stat-card">
+    <strong><%= number_with_delimiter(@total_accounts) %></strong>
+    <span>Clients suivis</span>
+  </div>
+  <div class="stat-card">
+    <strong><%= number_with_delimiter(@total_messages) %></strong>
+    <span>Réponses IA ce mois-ci</span>
+  </div>
+  <div class="stat-card">
+    <strong><%= number_with_delimiter(@total_embeddings) %></strong>
+    <span>Embeddings générés</span>
+  </div>
+  <div class="stat-card">
+    <strong><%= number_with_delimiter(@total_tokens) %></strong>
+    <span>Tokens consommés</span>
+  </div>
+</section>
+
+<section class="client-usage-board">
+  <% @account_usage_cards.each do |card| %>
+    <% account = card[:account] %>
+    <article class="client-usage-card client-usage-card-<%= card[:status] %>">
+      <div class="client-usage-card-header">
+        <div class="name-cell">
+          <strong><%= account.name.presence || "Client sans nom" %></strong>
+          <small><%= account.owner_email.presence || account.users.first&.email || "Aucun email propriétaire" %></small>
+        </div>
+        <span class="badge <%= "badge-warning" if card[:status] == "warning" %> <%= "badge-danger" if card[:status] == "danger" %> <%= "badge-success" if card[:status] == "success" %>">
+          <%= card[:status] == "unlimited" ? "Illimité" : "#{[card[:message_percent], card[:token_percent]].compact.max}%" %>
+        </span>
+      </div>
+
+      <div class="client-usage-metrics">
+        <div>
+          <strong><%= number_with_delimiter(card[:messages_used]) %></strong>
+          <span>messages</span>
+        </div>
+        <div>
+          <strong><%= number_with_delimiter(card[:tokens_used]) %></strong>
+          <span>tokens</span>
+        </div>
+        <div>
+          <strong><%= number_with_delimiter(card[:embeddings_used]) %></strong>
+          <span>embeddings</span>
+        </div>
+      </div>
+
+      <div class="client-usage-limits">
+        <div class="limit-row">
+          <div class="limit-row-label">
+            <span>Réponses IA</span>
+            <strong><%= account.monthly_message_limit.present? ? "#{number_with_delimiter(card[:messages_used])} / #{number_with_delimiter(account.monthly_message_limit)}" : "Illimité" %></strong>
+          </div>
+          <div class="usage-progress">
+            <span style="width: <%= card[:message_percent] || 100 %>%"></span>
+          </div>
+        </div>
+
+        <div class="limit-row">
+          <div class="limit-row-label">
+            <span>Tokens</span>
+            <strong><%= account.monthly_token_limit.present? ? "#{number_with_delimiter(card[:tokens_used])} / #{number_with_delimiter(account.monthly_token_limit)}" : "Illimité" %></strong>
+          </div>
+          <div class="usage-progress">
+            <span style="width: <%= card[:token_percent] || 100 %>%"></span>
+          </div>
+        </div>
+      </div>
+
+      <%= form_with(model: account, url: admin_usage_account_limits_path(account), method: :patch, class: "client-limits-form") do |form| %>
+        <div class="field">
+          <%= form.label :monthly_message_limit, "Limite messages" %>
+          <%= form.number_field :monthly_message_limit, min: 0, placeholder: "Illimité" %>
+        </div>
+        <div class="field">
+          <%= form.label :monthly_token_limit, "Limite tokens" %>
+          <%= form.number_field :monthly_token_limit, min: 0, placeholder: "Illimité" %>
+        </div>
+        <%= form.submit "Enregistrer", class: "btn btn-primary" %>
+      <% end %>
+
+      <div class="client-usage-footnote">
+        <span><%= pluralize(card[:agents_count], "agent") %></span>
+        <span><%= pluralize(card[:users_count], "utilisateur") %></span>
+        <span><%= account.plan.presence || "Plan non défini" %></span>
+      </div>
+    </article>
+  <% end %>
+</section>

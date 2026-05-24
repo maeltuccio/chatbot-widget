@@ -16,6 +16,12 @@ class ApplicationController < ActionController::Base
     redirect_to agents_path, alert: "Vous n'êtes pas autorisé à administrer cet espace de travail."
   end
 
+  def require_platform_admin!
+    return if current_user&.platform_admin?
+
+    redirect_to agents_path, alert: "Vous n'êtes pas autorisé à administrer la plateforme."
+  end
+
   def configure_permitted_parameters
     devise_parameter_sanitizer.permit(:sign_up, keys: [:account_name])
   end

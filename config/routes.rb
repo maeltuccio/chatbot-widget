@@ -1,7 +1,10 @@
 Rails.application.routes.draw do
   devise_for :users, skip: [:registrations]
   get "/usage", to: "usage#index", as: :usage
-  patch "/usage/limits", to: "usage#update_limits", as: :usage_limits
+  namespace :admin do
+    get "/usage", to: "usage#index", as: :usage
+    patch "/usage/accounts/:account_id/limits", to: "usage#update_limits", as: :usage_account_limits
+  end
   get "/widget.js", to: "widget#show"
   get "/widget-test", to: "widget_tests#show"
   get "/widget/agents/:public_token", to: "widget_agents#show"

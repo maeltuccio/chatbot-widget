@@ -1,8 +1,6 @@
 require "csv"
 
 class UsageController < ApplicationController
-  before_action :require_manager!, only: :update_limits
-
   def index
     respond_to do |format|
       format.html { load_usage }
@@ -12,16 +10,6 @@ class UsageController < ApplicationController
           filename: "usage-#{Time.current.strftime("%Y-%m")}.csv",
           type: "text/csv; charset=utf-8"
       end
-    end
-  end
-
-  def update_limits
-    if current_account.update(usage_limit_params)
-      redirect_to usage_path, notice: "Les limites d'utilisation ont été mises à jour."
-    else
-      load_usage
-      flash.now[:alert] = "Les limites d'utilisation n'ont pas pu être mises à jour."
-      render :index, status: :unprocessable_entity
     end
   end
 
@@ -50,13 +38,6 @@ class UsageController < ApplicationController
     return if limit.blank?
 
     [limit - used, 0].max
-  end
-
-  def usage_limit_params
-    params.require(:account).permit(:monthly_message_limit, :monthly_token_limit).tap do |permitted|
-      permitted[:monthly_message_limit] = nil if permitted[:monthly_message_limit].blank?
-      permitted[:monthly_token_limit] = nil if permitted[:monthly_token_limit].blank?
-    end
   end
 
   def usage_csv(events)

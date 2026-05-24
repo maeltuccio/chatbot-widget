@@ -2,36 +2,15 @@ require "test_helper"
 require "csv"
 
 class UsageControllerTest < ActionDispatch::IntegrationTest
-  test "manager can update workspace usage limits" do
-    sign_in users(:one)
+  test "usage page does not expose limit form" do
+    user = users(:one)
+    sign_in user
 
-    patch usage_limits_url, params: {
-      account: {
-        monthly_message_limit: 250,
-        monthly_token_limit: 50_000
-      }
-    }
+    get usage_url
 
-    assert_redirected_to usage_url
-    assert_equal 250, accounts(:one).reload.monthly_message_limit
-    assert_equal 50_000, accounts(:one).monthly_token_limit
-  end
-
-  test "blank limits are saved as unlimited" do
-    account = accounts(:one)
-    account.update!(monthly_message_limit: 10, monthly_token_limit: 100)
-    sign_in users(:one)
-
-    patch usage_limits_url, params: {
-      account: {
-        monthly_message_limit: "",
-        monthly_token_limit: ""
-      }
-    }
-
-    assert_redirected_to usage_url
-    assert_nil account.reload.monthly_message_limit
-    assert_nil account.monthly_token_limit
+    assert_response :success
+    refute_includes response.body, "Définir les limites"
+    refute_includes response.body, "Enregistrer les limites"
   end
 
   test "exports current month billable usage as csv" do

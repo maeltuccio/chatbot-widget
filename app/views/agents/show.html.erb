@@ -9,7 +9,7 @@
     <%= link_to "Conversations", agent_conversations_path(@agent), class: "btn" %>
     <%= link_to "Connaissance", agent_knowledge_sources_path(@agent), class: "btn" %>
     <%= link_to "Webflow", agent_webflow_connection_path(@agent), class: "btn" %>
-    <%= link_to "Modifier", edit_agent_path(@agent), class: "btn btn-primary" %>
+    <%= link_to "Modifier l'agent", edit_agent_path(@agent), class: "btn btn-primary" %>
   </div>
 </section>
 
@@ -138,6 +138,7 @@
 
   <div class="actions">
     <%= link_to "Retour aux agents", agents_path, class: "btn" %>
+    <%= link_to "Modifier l'agent", edit_agent_path(@agent), class: "btn btn-primary" %>
     <%= button_to "Supprimer l'agent",
       agent_path(@agent),
       method: :delete,

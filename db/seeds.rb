@@ -17,7 +17,15 @@ demo_account.users.find_or_create_by!(email: ENV.fetch("ADMIN_EMAIL", "admin@exa
   user.password = ENV.fetch("ADMIN_PASSWORD", "password123")
   user.password_confirmation = ENV.fetch("ADMIN_PASSWORD", "password123")
   user.role = "owner"
+  user.platform_admin = true
 end
+
+platform_admin_emails = [
+  ENV.fetch("ADMIN_EMAIL", "admin@example.com"),
+  *ENV.fetch("PLATFORM_ADMIN_EMAILS", "").split(",").map(&:strip)
+].reject(&:blank?).uniq
+
+User.where(email: platform_admin_emails).update_all(platform_admin: true)
 
 demo_agent = demo_account.agents.find_or_initialize_by(name: "Demo Agent")
 demo_agent.assign_attributes(

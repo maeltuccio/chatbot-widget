@@ -3,10 +3,12 @@ one:
   email: owner@example.com
   encrypted_password: <%= Devise::Encryptor.digest(User, "password123") %>
   role: owner
+  platform_admin: true
 
 two:
   account: two
   email: member@example.com
   encrypted_password: <%= Devise::Encryptor.digest(User, "password123") %>
   role: member
+  platform_admin: false
 # column: value
