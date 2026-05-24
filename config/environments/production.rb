@@ -94,6 +94,8 @@ Rails.application.configure do
   end
 
   config.hosts << ".fly.dev"
+  config.hosts << "studio47.tech"
+  config.hosts << "www.studio47.tech"
   # Skip DNS rebinding protection for the default health check endpoint.
   config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
 end
