@@ -28,6 +28,11 @@ html {
   background: var(--bg);
 }
 
+.turbo-progress-bar {
+  height: 3px;
+  background: var(--brand);
+}
+
 body {
   min-height: 100vh;
   margin: 0;
@@ -234,6 +239,10 @@ code {
   max-width: none;
 }
 
+.agent-create-layout .form-card {
+  max-width: none;
+}
+
 .agent-editor-playground {
   position: sticky;
   top: 92px;
@@ -280,6 +289,31 @@ code {
 .usage-agent-list {
   display: grid;
   gap: 2px;
+}
+
+.usage-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.usage-limits-card {
+  width: 100%;
+}
+
+.usage-card-row {
+  display: flex;
+  align-items: stretch;
+  gap: 18px;
+}
+
+.usage-card {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.usage-card-compact {
+  flex: 0 1 420px;
 }
 
 .usage-events-table {
@@ -855,6 +889,10 @@ pre {
   .usage-stats-grid,
   .agent-editor-layout {
     grid-template-columns: 1fr;
+  }
+
+  .usage-card-row {
+    flex-direction: column;
   }
 
   .agent-editor-playground {

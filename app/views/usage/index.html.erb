@@ -29,8 +29,8 @@
   </div>
 </section>
 
-<section class="grid grid-two">
-  <article class="card">
+<section class="usage-layout">
+  <article class="card usage-limits-card">
     <div class="card-body">
       <h2 class="section-title">Limites mensuelles</h2>
       <div class="detail-list">
@@ -49,10 +49,8 @@
       </div>
     </div>
   </article>
-</section>
-
-<section class="grid grid-two">
-  <article class="card">
+  <div class="usage-card-row">
+    <article class="card usage-card">
     <div class="card-body">
       <h2 class="section-title">Utilisation par agent</h2>
       <% if @usage_by_agent.present? %>
@@ -71,9 +69,9 @@
         <p class="muted">Aucune utilisation suivie ce mois-ci.</p>
       <% end %>
     </div>
-  </article>
+    </article>
 
-  <article class="card">
+    <article class="card usage-card usage-card-compact">
     <div class="card-body">
       <h2 class="section-title">Répartition des événements</h2>
       <div class="detail-list">
@@ -91,7 +89,8 @@
         </div>
       </div>
     </div>
-  </article>
+    </article>
+  </div>
 </section>
 
 <section class="table-wrap usage-events-table">
