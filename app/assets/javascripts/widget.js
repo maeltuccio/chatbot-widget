@@ -70,12 +70,74 @@
 
     form.appendChild(input);
     form.appendChild(submit);
+
+    var privacyNotice = document.createElement("p");
+    privacyNotice.className = "chatbot-saas-privacy";
+    privacyNotice.textContent = "En envoyant un message, vous acceptez que vos échanges soient traités afin de répondre à votre demande. Ne partagez pas d’informations sensibles.";
+
     body.appendChild(messages);
     body.appendChild(form);
+    body.appendChild(privacyNotice);
     panel.appendChild(header);
     panel.appendChild(body);
     container.appendChild(panel);
     document.body.appendChild(container);
+
+    function scrollMessagesToEnd() {
+      window.requestAnimationFrame(function () {
+        messages.scrollTop = messages.scrollHeight;
+      });
+    }
+
+    function scrollMessagesBy(deltaY) {
+      messages.scrollTop += deltaY;
+    }
+
+    function canScrollMessages() {
+      return messages.scrollHeight > messages.clientHeight;
+    }
+
+    var lastTouchY = null;
+
+    panel.addEventListener("wheel", function (event) {
+      if (!panel.classList.contains("chatbot-saas-panel-open")) {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      if (canScrollMessages()) {
+        scrollMessagesBy(event.deltaY);
+      }
+    }, { passive: false });
+
+    panel.addEventListener("touchstart", function (event) {
+      if (!panel.classList.contains("chatbot-saas-panel-open") || !event.touches.length) {
+        return;
+      }
+
+      lastTouchY = event.touches[0].clientY;
+    }, { passive: true });
+
+    panel.addEventListener("touchmove", function (event) {
+      if (!panel.classList.contains("chatbot-saas-panel-open") || lastTouchY === null || !event.touches.length) {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      if (canScrollMessages()) {
+        var currentTouchY = event.touches[0].clientY;
+        scrollMessagesBy(lastTouchY - currentTouchY);
+        lastTouchY = currentTouchY;
+      }
+    }, { passive: false });
+
+    panel.addEventListener("touchend", function () {
+      lastTouchY = null;
+    });
 
     function addMessage(text, role, extraClass) {
       var message = document.createElement("div");
@@ -85,7 +147,7 @@
       }
       renderMessageContent(message, text);
       messages.appendChild(message);
-      messages.scrollTop = messages.scrollHeight;
+      scrollMessagesToEnd();
       return message;
     }
 
@@ -140,7 +202,7 @@
       message.classList.remove("chatbot-saas-message-typing");
       message.dataset.rawContent = normalizeAssistantText((message.dataset.rawContent || message.textContent) + text);
       renderMessageContent(message, message.dataset.rawContent);
-      messages.scrollTop = messages.scrollHeight;
+      scrollMessagesToEnd();
     }
 
     function createTypingBuffer(message) {

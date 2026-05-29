@@ -3,8 +3,10 @@
   bottom: 20px;
   z-index: 2147483647;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  text-align: left;
+  overscroll-behavior: contain;
   --chatbot-saas-primary-color: #111827;
---chatbot-saas-panel-bg: rgb(255 255 255 / 32%);
+  --chatbot-saas-panel-bg: rgb(255 255 255 / 32%);
   --chatbot-saas-panel-border: rgba(226, 232, 240, 0.86);
   --chatbot-saas-panel-shadow: 0 24px 64px rgba(15, 23, 42, 0.2);
   --chatbot-saas-assistant-bg: rgba(248, 250, 252, 0.92);
@@ -206,6 +208,7 @@
   margin-block: 12px;
   overflow-y: auto;
   overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .chatbot-saas-message {
@@ -214,6 +217,7 @@
   overflow-wrap: anywhere;
   font-size: 14px;
   line-height: 1.4;
+  text-align: left;
   border-radius: 18px;
 }
 
@@ -282,6 +286,14 @@
   display: flex;
   gap: 8px;
   align-items: center;
+}
+
+.chatbot-saas-privacy {
+  margin: 8px 2px 0;
+  color: var(--chatbot-saas-assistant-text);
+  font-size: 10px;
+  line-height: 1.35;
+  opacity: 0.58;
 }
 
 .chatbot-saas-input {
