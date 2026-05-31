@@ -2,7 +2,6 @@
   <div>
     <span class="eyebrow">Utilisation</span>
     <h1 class="page-title">Tableau d'utilisation</h1>
-    <p class="page-description">Suivez les réponses IA, les embeddings et les tokens consommés par cet espace de travail.</p>
   </div>
 
   <div class="actions">
@@ -110,13 +109,13 @@
       <% if @recent_usage_events.present? %>
         <% @recent_usage_events.each do |event| %>
           <tr>
-            <td><%= l(event.created_at, format: :short) %></td>
-            <td><%= event.agent.name %></td>
-            <td><span class="badge"><%= event.event_type %></span></td>
-            <td><%= event.model.presence || "Inconnu" %></td>
-            <td><%= number_with_delimiter(event.input_tokens) %></td>
-            <td><%= number_with_delimiter(event.output_tokens) %></td>
-            <td><%= number_with_delimiter(event.total_tokens) %></td>
+            <td data-label="Date"><%= l(event.created_at, format: :short) %></td>
+            <td data-label="Agent"><%= event.agent.name %></td>
+            <td data-label="Type"><span class="badge"><%= event.event_type %></span></td>
+            <td data-label="Modèle"><%= event.model.presence || "Inconnu" %></td>
+            <td data-label="Entrée"><%= number_with_delimiter(event.input_tokens) %></td>
+            <td data-label="Sortie"><%= number_with_delimiter(event.output_tokens) %></td>
+            <td data-label="Total"><%= number_with_delimiter(event.total_tokens) %></td>
           </tr>
         <% end %>
       <% else %>

@@ -48,17 +48,39 @@
         </div>
       </header>
 
+      <% if notice.present? || alert.present? %>
+        <div class="flash-region" aria-live="polite" aria-atomic="true">
+          <% if notice.present? %>
+            <div class="flash flash-notice" data-controller="flash" data-flash-auto-dismiss-value="3000">
+              <span><%= notice %></span>
+              <button class="flash-close" type="button" aria-label="Fermer la notification" data-action="flash#close">&times;</button>
+            </div>
+          <% end %>
+
+          <% if alert.present? %>
+            <div class="flash flash-alert" data-controller="flash" data-flash-auto-dismiss-value="3000">
+              <span><%= alert %></span>
+              <button class="flash-close" type="button" aria-label="Fermer la notification" data-action="flash#close">&times;</button>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+
       <main class="app-container app-main">
-        <% if notice.present? %>
-          <div class="flash flash-notice"><%= notice %></div>
-        <% end %>
-
-        <% if alert.present? %>
-          <div class="flash flash-alert"><%= alert %></div>
-        <% end %>
-
         <%= yield %>
       </main>
+
+      <footer class="app-footer">
+        <div class="app-container app-footer-inner">
+          <span>&copy; <%= Time.current.year %> Studio 47</span>
+          <nav aria-label="Informations légales">
+            <%= link_to "Mentions légales", legal_notice_path %>
+            <%= link_to "Confidentialité", privacy_path %>
+            <%= link_to "CGU", terms_path %>
+            <%= link_to "Contact", contact_path %>
+          </nav>
+        </div>
+      </footer>
     </div>
   </body>
 </html>

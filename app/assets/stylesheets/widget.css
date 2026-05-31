@@ -218,6 +218,7 @@
   font-size: 14px;
   line-height: 1.4;
   text-align: left;
+  white-space: pre-line;
   border-radius: 18px;
 }
 
@@ -226,6 +227,10 @@
   font-weight: 700;
   text-decoration: underline;
   text-underline-offset: 2px;
+}
+
+.chatbot-saas-message strong {
+  font-weight: 700;
 }
 
 .chatbot-saas-message-assistant {
@@ -289,11 +294,34 @@
 }
 
 .chatbot-saas-privacy {
-  margin: 8px 2px 0;
+  max-height: 16px;
+  margin: 6px 2px 0;
+  overflow: hidden;
   color: var(--chatbot-saas-assistant-text);
-  font-size: 10px;
-  line-height: 1.35;
-  opacity: 0.58;
+  font-size: 9.5px;
+  line-height: 1.25;
+  opacity: 0.56;
+  transition:
+    max-height 180ms ease,
+    margin 180ms ease,
+    opacity 140ms ease;
+}
+
+.chatbot-saas-body:focus-within .chatbot-saas-privacy {
+  max-height: 0;
+  margin-top: 0;
+  opacity: 0;
+}
+
+.chatbot-saas-privacy a {
+  color: var(--chatbot-saas-primary-color);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.chatbot-saas-privacy-hidden {
+  display: none;
 }
 
 .chatbot-saas-input {

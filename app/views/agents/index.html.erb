@@ -2,7 +2,6 @@
   <div>
     <span class="eyebrow">Agents</span>
     <h1 class="page-title">Agents IA</h1>
-    <p class="page-description">Gérez les assistants, le widget, les conversations et les bases de connaissance depuis une seule interface.</p>
   </div>
 
   <div class="actions">
@@ -39,20 +38,20 @@
     <tbody>
       <% @agents.each do |agent| %>
         <tr>
-          <td>
+          <td data-label="Nom">
             <span class="name-cell">
               <strong><%= agent.name %></strong>
               <small><%= agent.public_token %></small>
             </span>
           </td>
-          <td><%= agent.tone.presence || "Non défini" %></td>
-          <td>
+          <td data-label="Tone"><%= agent.tone.presence || "Non défini" %></td>
+          <td data-label="Statut">
             <span class="badge <%= agent.active? ? "badge-success" : "badge-warning" %>">
               <%= agent_status_label(agent) %>
             </span>
           </td>
-          <td><%= pluralize(agent.knowledge_sources.size, "source") %></td>
-          <td>
+          <td data-label="Connaissance"><%= pluralize(agent.knowledge_sources.size, "source") %></td>
+          <td data-label="Actions">
             <div class="actions">
               <%= link_to "Ouvrir", agent_path(agent), class: "btn" %>
               <%= link_to "Modifier", edit_agent_path(agent), class: "btn" %>

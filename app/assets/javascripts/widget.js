@@ -72,8 +72,14 @@
     form.appendChild(submit);
 
     var privacyNotice = document.createElement("p");
-    privacyNotice.className = "chatbot-saas-privacy";
-    privacyNotice.textContent = "En envoyant un message, vous acceptez que vos échanges soient traités afin de répondre à votre demande. Ne partagez pas d’informations sensibles.";
+    privacyNotice.className = "chatbot-saas-privacy chatbot-saas-privacy-hidden";
+    privacyNotice.appendChild(document.createTextNode("Évitez les données sensibles. "));
+    var privacyLink = document.createElement("a");
+    privacyLink.href = baseUrl + "/confidentialite";
+    privacyLink.target = "_blank";
+    privacyLink.rel = "noopener noreferrer";
+    privacyLink.textContent = "Confidentialité";
+    privacyNotice.appendChild(privacyLink);
 
     body.appendChild(messages);
     body.appendChild(form);
@@ -153,18 +159,54 @@
 
     function renderMessageContent(message, text) {
       var content = text || "";
-      var urlPattern = /(https?:\/\/[^\s<]+)/g;
+      var linkPattern = /\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)|(https?:\/\/[^\s<]+)/g;
       var lastIndex = 0;
       var match;
 
       message.textContent = "";
 
-      while ((match = urlPattern.exec(content)) !== null) {
-        if (match.index > lastIndex) {
-          message.appendChild(document.createTextNode(content.slice(lastIndex, match.index)));
+      function appendLink(url, label) {
+        var link = document.createElement("a");
+        link.href = url;
+        link.textContent = label || url;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        message.appendChild(link);
+      }
+
+      function appendFormattedText(textSegment) {
+        var boldPattern = /\*\*([^*]+)\*\*/g;
+        var textLastIndex = 0;
+        var boldMatch;
+
+        while ((boldMatch = boldPattern.exec(textSegment)) !== null) {
+          if (boldMatch.index > textLastIndex) {
+            message.appendChild(document.createTextNode(textSegment.slice(textLastIndex, boldMatch.index)));
+          }
+
+          var strong = document.createElement("strong");
+          strong.textContent = boldMatch[1];
+          message.appendChild(strong);
+          textLastIndex = boldMatch.index + boldMatch[0].length;
         }
 
-        var rawUrl = match[0];
+        if (textLastIndex < textSegment.length) {
+          message.appendChild(document.createTextNode(textSegment.slice(textLastIndex)));
+        }
+      }
+
+      while ((match = linkPattern.exec(content)) !== null) {
+        if (match.index > lastIndex) {
+          appendFormattedText(content.slice(lastIndex, match.index));
+        }
+
+        if (match[1] && match[2]) {
+          appendLink(match[2], match[1]);
+          lastIndex = match.index + match[0].length;
+          continue;
+        }
+
+        var rawUrl = match[3];
         var trailingPunctuation = "";
 
         while (/[.,;:!?)]$/.test(rawUrl)) {
@@ -172,12 +214,7 @@
           rawUrl = rawUrl.slice(0, -1);
         }
 
-        var link = document.createElement("a");
-        link.href = rawUrl;
-        link.textContent = rawUrl;
-        link.target = "_blank";
-        link.rel = "noopener noreferrer";
-        message.appendChild(link);
+        appendLink(rawUrl);
 
         if (trailingPunctuation) {
           message.appendChild(document.createTextNode(trailingPunctuation));
@@ -187,7 +224,7 @@
       }
 
       if (lastIndex < content.length) {
-        message.appendChild(document.createTextNode(content.slice(lastIndex)));
+        appendFormattedText(content.slice(lastIndex));
       }
     }
 
@@ -195,7 +232,10 @@
       return text
         .replace(/([A-Za-zÀ-ÖØ-öø-ÿ])([0-9])/g, "$1 $2")
         .replace(/([0-9])([A-Za-zÀ-ÖØ-öø-ÿ])/g, "$1 $2")
-        .replace(/([.!?])([A-ZÀ-Ö])/g, "$1 $2");
+        .replace(/([,;!?])([^\s])/g, "$1 $2")
+        .replace(/([.!?])([A-ZÀ-Ö])/g, "$1 $2")
+        .replace(/\b(https?):\s*\/\//g, "$1://")
+        .replace(/[ \t]{2,}/g, " ");
     }
 
     function appendToMessage(message, text) {
@@ -206,14 +246,64 @@
     }
 
     function createTypingBuffer(message) {
+      var pendingText = "";
+      var intervalId = null;
+
+      function drain(force) {
+        if (!pendingText) {
+          if (intervalId) {
+            clearInterval(intervalId);
+            intervalId = null;
+          }
+          return;
+        }
+
+        var nextText = "";
+        var wordMatch = pendingText.match(/^\s*\S+\s+/);
+
+        if (wordMatch) {
+          nextText = wordMatch[0];
+        } else if (force) {
+          nextText = pendingText;
+        } else {
+          return;
+        }
+
+        pendingText = pendingText.slice(nextText.length);
+        appendToMessage(message, nextText);
+      }
+
+      function ensureInterval() {
+        if (intervalId) {
+          return;
+        }
+
+        intervalId = setInterval(function () {
+          drain(false);
+        }, 42);
+      }
+
       return {
         push: function (text) {
-          appendToMessage(message, text || "");
+          pendingText += text || "";
+          ensureInterval();
         },
         finish: function () {
+          while (pendingText) {
+            drain(true);
+          }
           message.classList.remove("chatbot-saas-message-typing");
+          if (intervalId) {
+            clearInterval(intervalId);
+            intervalId = null;
+          }
         },
         clear: function () {
+          pendingText = "";
+          if (intervalId) {
+            clearInterval(intervalId);
+            intervalId = null;
+          }
           message.dataset.rawContent = "";
         }
       };
@@ -316,7 +406,7 @@
       header.setAttribute("aria-expanded", isOpen ? "true" : "false");
       header.setAttribute("aria-label", isOpen ? "Fermer le chat" : "Ouvrir le chat");
 
-      if (isOpen) {
+      if (isOpen && document.activeElement === header) {
         input.focus();
       }
     }

@@ -5,6 +5,10 @@ Rails.application.routes.draw do
     get "/usage", to: "usage#index", as: :usage
     patch "/usage/accounts/:account_id/limits", to: "usage#update_limits", as: :usage_account_limits
   end
+  get "/mentions-legales", to: "legal_pages#legal_notice", as: :legal_notice
+  get "/confidentialite", to: "legal_pages#privacy", as: :privacy
+  get "/conditions", to: "legal_pages#terms", as: :terms
+  get "/contact", to: "legal_pages#contact", as: :contact
   get "/widget.js", to: "widget#show"
   get "/widget-test", to: "widget_tests#show"
   get "/widget/agents/:public_token", to: "widget_agents#show"

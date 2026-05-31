@@ -7,6 +7,9 @@ class WidgetMessagesController < ApplicationController
   MIN_MESSAGES_TO_SUMMARIZE = 12
   KNOWLEDGE_CHUNK_LIMIT = 6
   KNOWLEDGE_CONTEXT_MAX_CHARS = 4_000
+  MESSAGE_MAX_CHARS = ENV.fetch("WIDGET_MESSAGE_MAX_CHARS", 2_000).to_i
+  SESSION_MESSAGE_LIMIT = ENV.fetch("WIDGET_SESSION_MESSAGE_LIMIT", 20).to_i
+  SESSION_TOKEN_LIMIT = ENV.fetch("WIDGET_SESSION_TOKEN_LIMIT", 20_000).to_i
 
   skip_before_action :authenticate_user!
   skip_forgery_protection
@@ -23,9 +26,16 @@ class WidgetMessagesController < ApplicationController
       return
     end
 
+    if message_too_long?(message)
+      render json: { error: message_too_long_error }, status: :unprocessable_entity
+      return
+    end
+
     return unless ensure_usage_available!(agent)
 
     @conversation = find_or_create_conversation(agent)
+    return unless ensure_session_usage_available!(agent, @conversation)
+
     visitor_message = @conversation.messages.create!(role: "visitor", content: message)
     @conversation.touch_last_message_at!
 
@@ -68,9 +78,16 @@ class WidgetMessagesController < ApplicationController
       return
     end
 
+    if message_too_long?(message)
+      write_sse(:error, error: message_too_long_error)
+      return
+    end
+
     return unless ensure_usage_available!(agent, stream: true)
 
     @conversation = find_or_create_conversation(agent)
+    return unless ensure_session_usage_available!(agent, @conversation, stream: true)
+
     visitor_message = @conversation.messages.create!(role: "visitor", content: message)
     @conversation.touch_last_message_at!
 
@@ -134,6 +151,37 @@ class WidgetMessagesController < ApplicationController
     end
 
     false
+  end
+
+  def ensure_session_usage_available!(agent, conversation, stream: false)
+    return true if backoffice_preview_allowed?(agent)
+
+    error = session_usage_limit_error(conversation)
+    return true if error.blank?
+
+    if stream
+      write_sse(:error, error: error)
+    else
+      render json: { error: error, conversation_token: conversation.public_token }, status: :too_many_requests
+    end
+
+    false
+  end
+
+  def session_usage_limit_error(conversation)
+    if SESSION_MESSAGE_LIMIT.positive? && conversation.messages.where(role: "visitor").count >= SESSION_MESSAGE_LIMIT
+      "La limite de messages pour cette conversation est atteinte."
+    elsif SESSION_TOKEN_LIMIT.positive? && conversation.usage_events.where(event_type: "message").sum(:total_tokens) >= SESSION_TOKEN_LIMIT
+      "La limite de tokens pour cette conversation est atteinte."
+    end
+  end
+
+  def message_too_long?(message)
+    MESSAGE_MAX_CHARS.positive? && message.length > MESSAGE_MAX_CHARS
+  end
+
+  def message_too_long_error
+    "Le message est trop long. Limite actuelle : #{MESSAGE_MAX_CHARS} caractères."
   end
 
   def backoffice_preview_allowed?(agent)
@@ -274,7 +322,9 @@ class WidgetMessagesController < ApplicationController
     instructions << "Objectif principal : #{agent.primary_goal}." if agent.primary_goal.present?
     instructions << knowledge_instructions(agent, visitor_message)
     instructions << "Réponds de manière concise, utile et directement exploitable par le visiteur."
-    instructions << "Formate les réponses avec des espaces normaux entre les mots, les dates et la ponctuation. Utilise des paragraphes courts ou des puces quand la réponse contient plusieurs options."
+    instructions << "N'invente jamais de lien, prix, date, programme, disponibilité, adresse email, téléphone ou promesse commerciale. Si l'information n'est pas fournie par le contexte ou par la conversation, dis clairement que tu ne l'as pas."
+    instructions << "Pour les liens, utilise uniquement des URLs exactes présentes dans le contexte ou la conversation. Ne complète pas une URL, ne devine pas un slug et ne transforme pas un nom de page en lien."
+    instructions << "Formate les réponses avec des espaces normaux entre les mots, les dates et la ponctuation. Aère les réponses avec des sauts de ligne: utilise des paragraphes courts séparés par une ligne vide, ou des puces sur des lignes séparées quand la réponse contient plusieurs options."
     instructions.compact.join("\n\n")
   end
 
@@ -289,6 +339,7 @@ class WidgetMessagesController < ApplicationController
     <<~INSTRUCTIONS
       Utilise ce contexte de base de connaissance comme source de vérité pour les questions sur le produit, l'entreprise, les règles, les prix, le menu et la documentation.
       Si le visiteur demande une information absente de ce contexte, dis qu'elle n'est pas disponible dans la base de connaissance actuelle au lieu d'inventer une réponse.
+      Recopie les liens exactement comme ils apparaissent dans le contexte. Si aucun lien exact n'est présent, réponds sans lien.
 
       Contexte de base de connaissance :
       #{context}
@@ -348,7 +399,7 @@ class WidgetMessagesController < ApplicationController
       .sort_by { |chunk, score| [-score, chunk.knowledge_source_id, chunk.position] }
       .map(&:first)
 
-    selected_chunks = chunks.sort_by { |chunk| [chunk.knowledge_source_id, chunk.position] } if selected_chunks.blank?
+    return [] if selected_chunks.blank?
 
     fit_knowledge_context(selected_chunks.first(KNOWLEDGE_CHUNK_LIMIT))
   end

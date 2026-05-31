@@ -22,6 +22,20 @@ class Rack::Attack
     request.ip if request.post? && WIDGET_MESSAGE_PATHS.include?(request.path)
   end
 
+  throttle("widget messages by conversation", limit: 8, period: 5.minutes) do |request|
+    next unless request.post? && WIDGET_MESSAGE_PATHS.include?(request.path)
+
+    token = request.params["conversation_token"].presence
+    "#{request.params["agent_token"]}:#{token}" if token.present?
+  end
+
+  throttle("widget messages by visitor", limit: 12, period: 10.minutes) do |request|
+    next unless request.post? && WIDGET_MESSAGE_PATHS.include?(request.path)
+
+    visitor_identifier = request.params["visitor_identifier"].presence
+    "#{request.params["agent_token"]}:#{visitor_identifier}" if visitor_identifier.present?
+  end
+
   throttle("widget messages by agent", limit: 300, period: 1.hour) do |request|
     next unless request.post? && WIDGET_MESSAGE_PATHS.include?(request.path)
 

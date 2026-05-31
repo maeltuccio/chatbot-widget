@@ -2,7 +2,6 @@
   <div>
     <span class="eyebrow">Conversations</span>
     <h1 class="page-title"><%= @agent.name %></h1>
-    <p class="page-description">Consultez les sessions visiteurs et l'historique des messages.</p>
   </div>
 
   <div class="actions">
@@ -23,10 +22,10 @@
     <tbody>
       <% @conversations.each do |conversation| %>
         <tr>
-          <td><code><%= conversation.public_token %></code></td>
-          <td><%= conversation.messages.size %></td>
-          <td><%= l((conversation.last_message_at || conversation.created_at), format: :short) %></td>
-          <td><%= link_to "Ouvrir", agent_conversation_path(@agent, conversation), class: "btn" %></td>
+          <td data-label="Token"><code><%= conversation.public_token %></code></td>
+          <td data-label="Messages"><%= conversation.messages.size %></td>
+          <td data-label="Dernier message"><%= l((conversation.last_message_at || conversation.created_at), format: :short) %></td>
+          <td data-label="Actions"><%= link_to "Ouvrir", agent_conversation_path(@agent, conversation), class: "btn" %></td>
         </tr>
       <% end %>
     </tbody>

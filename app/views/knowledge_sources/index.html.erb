@@ -2,7 +2,6 @@
   <div>
     <span class="eyebrow">Connaissance</span>
     <h1 class="page-title"><%= @agent.name %></h1>
-    <p class="page-description">Gérez les contenus utilisés par l'assistant pour répondre aux visiteurs.</p>
   </div>
 
   <div class="actions">
@@ -26,21 +25,21 @@
     <tbody>
       <% @knowledge_sources.each do |knowledge_source| %>
         <tr>
-          <td>
+          <td data-label="Titre">
             <span class="name-cell">
               <strong><%= knowledge_source.title %></strong>
               <small><%= truncate(knowledge_source.raw_content.to_s, length: 84) %></small>
             </span>
           </td>
-          <td><%= source_type_label(knowledge_source.source_type) %></td>
-          <td>
+          <td data-label="Type"><%= source_type_label(knowledge_source.source_type) %></td>
+          <td data-label="Statut">
             <span class="badge <%= knowledge_source.status == "ready" ? "badge-success" : "badge-warning" %>">
               <%= source_status_label(knowledge_source.status) %>
             </span>
           </td>
-          <td><%= knowledge_source.knowledge_chunks.size %></td>
-          <td><%= l(knowledge_source.updated_at, format: :short) %></td>
-          <td>
+          <td data-label="Morceaux"><%= knowledge_source.knowledge_chunks.size %></td>
+          <td data-label="Mis à jour"><%= l(knowledge_source.updated_at, format: :short) %></td>
+          <td data-label="Actions">
             <div class="actions">
               <%= link_to "Ouvrir", agent_knowledge_source_path(@agent, knowledge_source), class: "btn" %>
               <%= link_to "Modifier", edit_agent_knowledge_source_path(@agent, knowledge_source), class: "btn" %>
